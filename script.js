@@ -150,7 +150,7 @@
           '<div class="price">' + formatPrice(data.price) + "</div>" +
           '<p class="desc">' + escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") + "</p>" +
           '<div class="pdp-actions">' +
-          '<a class="btn btn-red" href="https://wa.me/237600000000?text=' +
+          '<a class="btn btn-red" href="https://wa.me/237690100325?text=' +
           encodeURIComponent("Bonjour, je suis intéressé par : " + data.name) +
           '" target="_blank" rel="noopener">Commander WhatsApp</a>' +
           '<a class="btn btn-outline-dark" href="' +
