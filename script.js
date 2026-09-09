@@ -1,32 +1,42 @@
-// CoolestKidz
+// CoolestKidz — shared frontend
 (function () {
   function getClient() {
     var cfg = window.COOLESTKIDZ_CONFIG || {};
     if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) return null;
     return window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   }
+
   function formatPrice(n) {
     return new Intl.NumberFormat("fr-FR").format(n || 0) + " FCFA";
   }
+
   function escapeHtml(t) {
     var d = document.createElement("div");
     d.textContent = t || "";
     return d.innerHTML;
   }
+
   function normalizeCategory(cat) {
     var c = (cat || "").toLowerCase();
-    if (c.indexOf("enfant") !== -1 || c.indexOf("kids") !== -1 || c.indexOf("kid") !== -1) return "Enfants";
+    if (c.indexOf("enfant") !== -1 || c.indexOf("kids") !== -1 || c.indexOf("kid") !== -1) {
+      return "Enfants";
+    }
     return "Adultes";
   }
+
   function qs(name) {
     return new URLSearchParams(location.search).get(name);
   }
 
+  // Header scroll
   var header = document.getElementById("header");
-  window.addEventListener("scroll", function () {
-    if (header) header.classList.toggle("scrolled", window.scrollY > 30);
-  }, { passive: true });
+  if (header) {
+    window.addEventListener("scroll", function () {
+      header.classList.toggle("scrolled", window.scrollY > 30);
+    }, { passive: true });
+  }
 
+  // Mobile menu
   var menuBtn = document.getElementById("menuToggle");
   var navMobile = document.getElementById("navMobile");
   if (menuBtn && navMobile) {
@@ -57,7 +67,7 @@
     );
   }
 
-  // Featured on landing
+  // Featured products on landing
   var featured = document.getElementById("featuredGrid");
   if (featured) {
     (async function () {
@@ -68,17 +78,20 @@
       }
       try {
         var res = await client.from("products").select("*").order("id", { ascending: false }).limit(8);
+        if (res.error) throw res.error;
         var list = res.data || [];
         featured.innerHTML = list.length
           ? list.map(productCard).join("")
           : '<div class="empty">Aucun article pour le moment.</div>';
       } catch (e) {
+        console.error(e);
         featured.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
     })();
   }
 
-  // Shop grids (adultes / enfants)
+  // Shop grids (adultes.html / enfants.html)
+  var grid = document.getElementById("productsGrid");
   if (grid && grid.dataset.category) {
     var cat = grid.dataset.category;
     (async function () {
@@ -97,12 +110,14 @@
           ? list.map(productCard).join("")
           : '<div class="empty">Aucun article dans cette collection.</div>';
       } catch (e) {
+        console.error(e);
         grid.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
     })();
   }
 
-  // Product detail page
+  // Product detail page (produit.html)
+  var pdp = document.getElementById("pdp");
   if (pdp) {
     var id = qs("id");
     (async function () {
@@ -111,10 +126,13 @@
         return;
       }
       var client = getClient();
-      if (!client) return;
+      if (!client) {
+        pdp.innerHTML = '<div class="empty">Configuration requise.</div>';
+        return;
+      }
       try {
         var res = await client.from("products").select("*").eq("id", id).single();
-        if (res.error || !res.data) throw res.error || new Error("nf");
+        if (res.error || !res.data) throw res.error || new Error("not found");
         var data = res.data;
         var cat = normalizeCategory(data.category);
         document.title = (data.name || "Article") + " — CoolestKidz";
@@ -127,22 +145,23 @@
           '<div class="cat">' + escapeHtml(cat) + "</div>" +
           "<h1>" + escapeHtml(data.name) + "</h1>" +
           '<div class="price">' + formatPrice(data.price) + "</div>" +
-          '<p class="desc">' + escapeHtml(data.description || "Piece CoolestKidz - qualite premium.") + "</p>" +
+          '<p class="desc">' + escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") + "</p>" +
           '<div class="pdp-actions">' +
           '<a class="btn btn-red" href="https://wa.me/237600000000?text=' +
-          encodeURIComponent("Bonjour, je suis interesse par : " + data.name) +
+          encodeURIComponent("Bonjour, je suis intéressé par : " + data.name) +
           '" target="_blank" rel="noopener">Commander WhatsApp</a>' +
           '<a class="btn btn-outline-dark" href="' +
           (cat === "Enfants" ? "enfants.html" : "adultes.html") +
           '">Retour</a>' +
           "</div></div>";
       } catch (e) {
+        console.error(e);
         pdp.innerHTML = '<div class="empty">Article introuvable.</div>';
       }
     })();
   }
 
-  // Sub-brands list
+  // Sub-brands list (landing + sous-marques.html)
   var sbGridEl = document.getElementById("subbrandsGrid");
   if (sbGridEl) {
     (async function () {
@@ -176,6 +195,7 @@
           })
           .join("");
       } catch (e) {
+        console.error(e);
         sbGridEl.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
     })();
@@ -184,17 +204,17 @@
   // Sub-brand detail page
   var sbTitle = document.getElementById("sbTitle");
   if (sbTitle) {
-    var id = qs("id");
+    var sbId = qs("id");
     var pgrid = document.getElementById("productsGrid");
     (async function () {
       var client = getClient();
-      if (!client || !id) {
+      if (!client || !sbId) {
         if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
         return;
       }
       try {
-        var res = await client.from("sub_brands").select("*").eq("id", id).single();
-        if (res.error || !res.data) throw res.error || new Error("nf");
+        var res = await client.from("sub_brands").select("*").eq("id", sbId).single();
+        if (res.error || !res.data) throw res.error || new Error("not found");
         var sb = res.data;
         sbTitle.textContent = sb.name;
         var descEl = document.getElementById("sbDesc");
@@ -203,7 +223,7 @@
         var res2 = await client
           .from("products")
           .select("*")
-          .eq("sub_brand_id", id)
+          .eq("sub_brand_id", sbId)
           .order("id", { ascending: false });
         var list = res2.data || [];
         if (pgrid) {
@@ -212,12 +232,13 @@
             : '<div class="empty">Aucun article dans cette ligne.</div>';
         }
       } catch (e) {
+        console.error(e);
         if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
       }
     })();
   }
 
-  // Contact form
+  // Contact form (simple feedback)
   var contactForm = document.getElementById("contactForm");
   if (contactForm) {
     contactForm.addEventListener("submit", function (e) {
@@ -225,7 +246,7 @@
       var btn = contactForm.querySelector('button[type="submit"]');
       if (btn) {
         var t = btn.textContent;
-        btn.textContent = "Message envoye";
+        btn.textContent = "Message envoyé";
         btn.disabled = true;
         setTimeout(function () {
           btn.textContent = t;
@@ -236,7 +257,3 @@
     });
   }
 })();
-'''
-Path('/home/workdir/artifacts/coolestkidz/script.js').write_text(js)
-print('script done')
-PY
