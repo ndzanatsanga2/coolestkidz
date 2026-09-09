@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoolestKidz — Mode Premium Camerounaise</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="description" content="CoolestKidz — Marque de mode premium née au Cameroun. Collections Adultes et Enfants.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img src="logo.png" alt="CoolestKidz">
+        <span>COOLEST<b>KIDZ</b></span>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="#accueil">Accueil</a>
+        <a href="#collections">Collections</a>
+        <a href="adultes.html">Adultes</a>
+        <a href="enfants.html">Enfants</a>
+        <a href="#apropos">À propos</a>
+        <a href="#sous-marques">Sous-marques</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="header-cta">
+        <button class="menu-btn" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-mobile" id="navMobile">
+    <a href="#accueil">Accueil</a>
+    <a href="#collections">Collections</a>
+    <a href="adultes.html">Adultes</a>
+    <a href="enfants.html">Enfants</a>
+    <a href="#apropos">À propos</a>
+    <a href="#sous-marques">Sous-marques</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <section class="hero" id="accueil">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Marque Camerounaise Premium</p>
+      <h1>Coolest<span>Kidz</span></h1>
+      <p>L’élégance contemporaine pour adultes et enfants.<br>Style, authenticité et excellence.</p>
+      <div class="hero-actions">
+        <a href="adultes.html" class="btn btn-red">Collection Adultes</a>
+        <a href="enfants.html" class="btn btn-outline">Collection Enfants</a>
+      </div>
+    </div>
+    <div class="hero-scroll"><span>Scroll</span><i></i></div>
+  </section>
+
+  <section class="section" id="collections">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Boutique</span>
+        <h2>Nos collections</h2>
+        <p>Deux univers, une même exigence de qualité.</p>
+      </div>
+      <div class="cat-grid">
+        <a href="adultes.html" class="cat-card">
+          <small>Shop</small>
+          <h3>Adultes</h3>
+          <span>Entrer dans la collection</span>
+        </a>
+        <a href="enfants.html" class="cat-card">
+          <small>Shop</small>
+          <h3>Enfants</h3>
+          <span>Entrer dans la collection</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Sélection</span>
+        <h2>Pièces en avant</h2>
+        <p>Un aperçu de nos articles récents.</p>
+      </div>
+      <div class="products-grid" id="featuredGrid">
+        <div class="loading">Chargement…</div>
+      </div>
+      <div class="section-cta">
+        <a href="adultes.html" class="btn btn-outline">Voir toute la boutique</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="apropos">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text">
+          <span class="section-tag">À propos</span>
+          <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;letter-spacing:-0.02em;margin:8px 0 20px;line-height:1.2">Née à Douala,<br>pensée pour le quotidien.</h2>
+          <p class="lead">CoolestKidz est une marque de prêt-à-porter camerounaise. Nous concevons des vêtements pour adultes et pour enfants — des pièces solides, bien coupées, que l’on porte vraiment.</p>
+          <p>Les tissus sont choisis pour tenir dans le climat local. Les coupes restent actuelles sans suivre chaque tendance. L’objectif est simple : proposer une mode accessible, soignée, et reconnaissable.</p>
+          <p>Derrière chaque collection, une équipe locale travaille sur les modèles, les essayages et la finition. Ce n’est pas une marque importée : c’est une maison construite ici, pour ceux qui vivent ici.</p>
+          <div class="about-stats">
+            <div><strong>2</strong><span>Lignes</span></div>
+            <div><strong>CM</strong><span>Cameroun</span></div>
+            <div><strong>2024</strong><span>Lancement</span></div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div class="about-card">
+            <img src="logo.png" alt="CoolestKidz">
+            <p>CoolestKidz — Premium</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="sous-marques">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Univers</span>
+        <h2>Sous-marques</h2>
+        <p>Les lignes qui composent la maison CoolestKidz.</p>
+      </div>
+      <div class="sb-grid" id="subbrandsGrid">
+        <div class="loading">Chargement…</div>
+      </div>
+      <div class="section-cta" style="margin-top:28px">
+        <a href="sous-marques.html" class="btn btn-outline">Toutes les sous-marques</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">Contact</span>
+        <h2>Parlons-en</h2>
+        <p>Commandes, tailles, partenariats.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <p>Notre équipe répond pour les commandes et les demandes professionnelles.</p>
+          <div class="contact-row">
+            <label>WhatsApp</label>
+            <a href="https://wa.me/237600000000" target="_blank" rel="noopener">+237 6XX XX XX XX</a>
+          </div>
+          <div class="contact-row">
+            <label>Email</label>
+            <a href="mailto:contact@coolestkidz.cm">contact@coolestkidz.cm</a>
+          </div>
+          <div class="contact-row">
+            <label>Instagram</label>
+            <a href="https://instagram.com/coolestkidz" target="_blank" rel="noopener">@coolestkidz</a>
+          </div>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-row">
+            <div class="field">
+              <label>Nom</label>
+              <input name="name" required autocomplete="name">
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" name="email" required autocomplete="email">
+            </div>
+          </div>
+          <div class="field">
+            <label>Message</label>
+            <textarea name="message" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-red btn-full">Envoyer</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="">
+        <p>CoolestKidz<br>Mode premium camerounaise</p>
+      </div>
+      <div class="footer-col">
+        <h4>Boutique</h4>
+        <a href="adultes.html">Adultes</a>
+        <a href="enfants.html">Enfants</a>
+        <a href="sous-marques.html">Sous-marques</a>
+      </div>
+      <div class="footer-col">
+        <h4>Maison</h4>
+        <a href="#apropos">À propos</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Suivre</h4>
+        <a href="https://instagram.com/coolestkidz" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://wa.me/237600000000" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 CoolestKidz. Tous droits réservés.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — CoolestKidz</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <style>
+    :root {
+      --red: #C41E24;
+      --ink: #111;
+      --muted: #6B6B6B;
+      --line: #E8E8E6;
+      --paper: #fff;
+      --soft: #FAFAF8;
+      --warm: #F4F3F0;
+      --danger: #B91C1C;
+      --ok: #1B7A4A;
+      --font: 'Montserrat', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--soft); color: var(--ink); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Login */
+    .login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--ink);
+    }
+    .login-box {
+      background: var(--paper);
+      width: 100%;
+      max-width: 380px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .login-box img { width: 48px; margin: 0 auto 20px; }
+    .login-box h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .login-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      margin-bottom: 14px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .login-box input:focus { border-color: var(--ink); }
+    .login-err { color: var(--danger); font-size: 0.8rem; margin-top: 12px; display: none; }
+
+    /* Shell */
+    .shell { display: none; min-height: 100vh; }
+    .top {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .top-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; }
+    .top-brand img { width: 28px; }
+    .top-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .top-actions a, .top-actions button.link {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .top-actions a:hover, .top-actions button.link:hover { color: var(--ink); }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+    }
+    .tab {
+      padding: 12px 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: -1px;
+    }
+    .tab.active { color: var(--ink); border-bottom-color: var(--red); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar h2 { font-size: 1.15rem; font-weight: 700; }
+    .toolbar h2 span { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      background: var(--ink);
+      color: #fff;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn:hover { background: var(--red); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    .btn-outline:hover { border-color: var(--ink); background: var(--warm); }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #991b1b; }
+    .btn-sm { padding: 8px 12px; font-size: 0.68rem; }
+
+    .msg {
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .msg.ok { display: block; background: #E8F5EE; color: var(--ok); }
+    .msg.err { display: block; background: #FDECEC; color: var(--danger); }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--paper); }
+    table { width: 100%; border-collapse: collapse; min-width: 560px; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: 0.88rem; }
+    th {
+      background: var(--warm);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    tr:last-child td { border-bottom: none; }
+    .thumb {
+      width: 48px; height: 48px; object-fit: cover; background: var(--warm);
+    }
+    .thumb-ph {
+      width: 48px; height: 48px; background: var(--warm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--warm);
+    }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .empty { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--paper); border: 1px solid var(--line); }
+
+    /* Modal */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+      padding: 0;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--paper);
+      width: 100%;
+      max-width: 480px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 28px 22px 32px;
+    }
+    @media (min-width: 600px) {
+      .overlay { align-items: center; padding: 24px; }
+    }
+    .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 22px; }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      font-size: 0.95rem;
+      outline: none;
+      background: var(--paper);
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+    .field textarea { min-height: 90px; resize: vertical; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .row-2 { grid-template-columns: 1fr; } }
+    .check { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .check input { width: auto; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .modal-actions .btn { flex: 1; }
+
+    .upload {
+      border: 1.5px dashed var(--line);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .upload:hover { border-color: var(--ink); }
+    .upload input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload p { font-size: 0.85rem; color: var(--muted); pointer-events: none; }
+    .upload .hint { font-size: 0.75rem; margin-top: 4px; }
+    .preview { margin-top: 12px; display: none; }
+    .preview.show { display: block; }
+    .preview img { max-height: 160px; max-width: 100%; object-fit: contain; background: var(--warm); }
+    .preview button {
+      margin-top: 8px; background: none; border: none; color: var(--danger);
+      font-size: 0.8rem; cursor: pointer; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="login" id="loginScreen">
+    <div class="login-box">
+      <img src="logo.png" alt="">
+      <h1>ADMINISTRATION</h1>
+      <p>Gérez articles et sous-marques</p>
+      <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="btn" style="width:100%" id="loginBtn">Se connecter</button>
+      <p class="login-err" id="loginError">Mot de passe incorrect</p>
+    </div>
+  </div>
+
+  <div class="shell" id="adminShell">
+    <div class="top">
+      <div class="top-brand">
+        <img src="logo.png" alt="">
+        <span>COOLESTKIDZ ADMIN</span>
+      </div>
+      <div class="top-actions">
+        <a href="index.html" target="_blank">Voir le site</a>
+        <button class="link" id="logoutBtn">Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div id="statusMsg" class="msg"></div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="products">Articles</button>
+        <button class="tab" data-tab="subs">Sous-marques</button>
+      </div>
+
+      <!-- Products panel -->
+      <div class="panel active" id="panel-products">
+        <div class="toolbar">
+          <h2>Articles <span id="productCount"></span></h2>
+          <button class="btn" id="addProductBtn">+ Article</button>
+        </div>
+        <div class="table-wrap" id="productTableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th>Sous-marque</th>
+                <th>Prix</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="productEmpty" style="display:none">Aucun article.</div>
+      </div>
+
+      <!-- Sub-brands panel -->
+      <div class="panel" id="panel-subs">
+        <div class="toolbar">
+          <h2>Sous-marques <span id="subCount"></span></h2>
+          <button class="btn" id="addSubBtn">+ Sous-marque</button>
+        </div>
+        <div class="table-wrap" id="subTableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="subBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="subEmpty" style="display:none">Aucune sous-marque.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product modal -->
+  <div class="overlay" id="productModal">
+    <div class="modal">
+      <h3 id="productModalTitle">Nouvel article</h3>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <input type="hidden" id="existingImage">
+        <div class="field">
+          <label>Nom *</label>
+          <input id="name" required placeholder="Ex: Chemise lin">
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Catégorie</label>
+            <select id="category">
+              <option value="Adultes">Adultes</option>
+              <option value="Enfants">Enfants</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Prix (FCFA) *</label>
+            <input type="number" id="price" required min="0" step="500" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label>Sous-marque</label>
+          <select id="productSubBrand">
+            <option value="">CoolestKidz (principale)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="description" placeholder="Matière, coupe, détails…"></textarea>
+        </div>
+        <div class="field">
+          <label>Photo</label>
+          <div class="upload" id="uploadZone">
+            <input type="file" id="imageFile" accept="image/*">
+            <p>Choisir une photo</p>
+            <p class="hint">JPG, PNG · max 8 Mo</p>
+          </div>
+          <div class="preview" id="previewBox">
+            <img id="previewImg" alt="">
+            <button type="button" id="removeImg">Supprimer</button>
+          </div>
+        </div>
+        <div class="check">
+          <input type="checkbox" id="featured">
+          <label for="featured" style="margin:0;text-transform:none;letter-spacing:0;font-size:0.9rem;color:var(--ink)">Mettre en avant</label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancelProduct">Annuler</button>
+          <button type="submit" class="btn" id="saveProduct">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sub modal -->
+  <div class="overlay" id="subModal">
+    <div class="modal">
+      <h3 id="subModalTitle">Nouvelle sous-marque</h3>
+      <form id="subForm">
+        <input type="hidden" id="subId">
+        <input type="hidden" id="subLogo">
+        <div class="field">
+          <label>Nom *</label>
+          <input id="subName" required>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="subDesc"></textarea>
+        </div>
+        <div class="field">
+          <label>Logo / image</label>
+          <div class="upload" id="subUploadZone">
+            <input type="file" id="subLogoFile" accept="image/*">
+            <p>Choisir un logo</p>
+            <p class="hint">JPG, PNG · max 8 Mo</p>
+          </div>
+          <div class="preview" id="subPreviewBox">
+            <img id="subPreviewImg" alt="">
+            <button type="button" id="subRemoveImg">Supprimer</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancelSub">Annuler</button>
+          <button type="submit" class="btn">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const cfg = window.COOLESTKIDZ_CONFIG || {};
+    const PASSWORD = cfg.ADMIN_PASSWORD || 'coolestkidz2026';
+    let supabaseClient = null;
+    let selectedFile = null;
+    let selectedSubFile = null;
+    let subBrandsCache = [];
+
+    const loginScreen = document.getElementById('loginScreen');
+    const adminShell = document.getElementById('adminShell');
+
+    function initSupabase() {
+      if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return false;
+      supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      return true;
+    }
+    function showStatus(text, type) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = text;
+      el.className = 'msg ' + type;
+      setTimeout(() => { el.className = 'msg'; }, 4000);
+    }
+    function escapeHtml(t) {
+      const d = document.createElement('div');
+      d.textContent = t || '';
+      return d.innerHTML;
+    }
+    function formatPrice(n) {
+      return new Intl.NumberFormat('fr-FR').format(n || 0) + ' FCFA';
+    }
+    function compressImage(file, maxW = 900, quality = 0.78) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Lecture impossible'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Image invalide'));
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Auth
+    if (sessionStorage.getItem('ck_admin_pwd') === PASSWORD) {
+      loginScreen.style.display = 'none';
+      adminShell.style.display = 'block';
+      if (initSupabase()) { loadProducts(); loadSubbrands(); }
+    }
+    document.getElementById('loginBtn').onclick = () => {
+      if (document.getElementById('passwordInput').value === PASSWORD) {
+        sessionStorage.setItem('ck_admin_pwd', PASSWORD);
+        document.getElementById('loginError').style.display = 'none';
+        loginScreen.style.display = 'none';
+        adminShell.style.display = 'block';
+        if (initSupabase()) { loadProducts(); loadSubbrands(); }
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    };
+    document.getElementById('passwordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+    document.getElementById('logoutBtn').onclick = () => {
+      sessionStorage.removeItem('ck_admin_pwd');
+      location.reload();
+    };
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      };
+    });
+
+    // ——— Products ———
+    async function loadProducts() {
+      const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+      if (error) { showStatus(error.message, 'err'); return; }
+      const list = data || [];
+      document.getElementById('productCount').textContent = '(' + list.length + ')';
+      const wrap = document.getElementById('productTableWrap');
+      const empty = document.getElementById('productEmpty');
+      if (!list.length) {
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      wrap.style.display = 'block';
+      empty.style.display = 'none';
+      const subMap = Object.fromEntries(subBrandsCache.map(s => [s.id, s.name]));
+      document.getElementById('productsBody').innerHTML = list.map(p => {
+        const img = p.image ? `<img class="thumb" src="${escapeHtml(p.image)}">` : `<div class="thumb-ph">—</div>`;
+        const sub = p.sub_brand_id ? (subMap[p.sub_brand_id] || '—') : 'Principale';
+        return `<tr>
+          <td>${img}</td>
+          <td><strong>${escapeHtml(p.name)}</strong></td>
+          <td><span class="badge">${escapeHtml(p.category || '')}</span></td>
+          <td>${escapeHtml(sub)}</td>
+          <td>${formatPrice(p.price)}</td>
+          <td class="actions">
+            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function fillSubSelect(selected) {
+      const sel = document.getElementById('productSubBrand');
+      sel.innerHTML = '<option value="">CoolestKidz (principale)</option>' +
+        subBrandsCache.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      if (selected) sel.value = String(selected);
+    }
+
+    function resetProductUpload() {
+      selectedFile = null;
+      document.getElementById('imageFile').value = '';
+      document.getElementById('previewBox').classList.remove('show');
+      document.getElementById('uploadZone').style.display = 'block';
+      document.getElementById('existingImage').value = '';
+    }
+
+    document.getElementById('imageFile').onchange = () => {
+      const f = document.getElementById('imageFile').files[0];
+      if (!f) return;
+      if (f.size > 8 * 1024 * 1024) { alert('Max 8 Mo'); return; }
+      selectedFile = f;
+      document.getElementById('previewImg').src = URL.createObjectURL(f);
+      document.getElementById('previewBox').classList.add('show');
+      document.getElementById('uploadZone').style.display = 'none';
+    };
+    document.getElementById('removeImg').onclick = resetProductUpload;
+
+    document.getElementById('addProductBtn').onclick = () => {
+      document.getElementById('productModalTitle').textContent = 'Nouvel article';
+      document.getElementById('productForm').reset();
+      document.getElementById('productId').value = '';
+      resetProductUpload();
+      fillSubSelect();
+      document.getElementById('productModal').classList.add('open');
+    };
+    document.getElementById('cancelProduct').onclick = () => document.getElementById('productModal').classList.remove('open');
+    document.getElementById('productModal').onclick = e => {
+      if (e.target.id === 'productModal') e.target.classList.remove('open');
+    };
+
+    window.editProduct = async function(id) {
+      const { data, error } = await supabaseClient.from('products').select('*').eq('id', id).single();
+      if (error || !data) return showStatus('Introuvable', 'err');
+      document.getElementById('productModalTitle').textContent = 'Modifier l’article';
+      document.getElementById('productId').value = data.id;
+      document.getElementById('name').value = data.name;
+      document.getElementById('category').value = data.category === 'Enfants' ? 'Enfants' : 'Adultes';
+      document.getElementById('price').value = data.price;
+      document.getElementById('description').value = data.description || '';
+      document.getElementById('featured').checked = !!data.featured;
+      document.getElementById('existingImage').value = data.image || '';
+      selectedFile = null;
+      document.getElementById('imageFile').value = '';
+      fillSubSelect(data.sub_brand_id);
+      if (data.image) {
+        document.getElementById('previewImg').src = data.image;
+        document.getElementById('previewBox').classList.add('show');
+        document.getElementById('uploadZone').style.display = 'none';
+      } else {
+        document.getElementById('previewBox').classList.remove('show');
+        document.getElementById('uploadZone').style.display = 'block';
+      }
+      document.getElementById('productModal').classList.add('open');
+    };
+
+    window.deleteProduct = async function(id) {
+      if (!confirm('Supprimer cet article ?')) return;
+      const { error } = await supabaseClient.from('products').delete().eq('id', id);
+      if (error) showStatus(error.message, 'err');
+      else { showStatus('Article supprimé', 'ok'); loadProducts(); }
+    };
+
+    window.addProductToSub = function(subId, subName) {
+      document.getElementById('productModalTitle').textContent = 'Article — ' + (subName || '');
+      document.getElementById('productForm').reset();
+      document.getElementById('productId').value = '';
+      resetProductUpload();
+      fillSubSelect(subId);
+      document.getElementById('productModal').classList.add('open');
+    };
+
+    document.getElementById('productForm').onsubmit = async e => {
+      e.preventDefault();
+      const btn = document.getElementById('saveProduct');
+      btn.disabled = true;
+      btn.textContent = '…';
+      try {
+        let imageUrl = document.getElementById('existingImage').value || '';
+        if (selectedFile) imageUrl = await compressImage(selectedFile);
+        const subVal = document.getElementById('productSubBrand').value;
+        const payload = {
+          name: document.getElementById('name').value.trim(),
+          category: document.getElementById('category').value,
+          price: parseInt(document.getElementById('price').value, 10) || 0,
+          description: document.getElementById('description').value.trim(),
+          image: imageUrl,
+          featured: document.getElementById('featured').checked,
+          sub_brand_id: subVal ? parseInt(subVal, 10) : null
+        };
+        const id = document.getElementById('productId').value;
+        let error;
+        if (id) ({ error } = await supabaseClient.from('products').update(payload).eq('id', id));
+        else ({ error } = await supabaseClient.from('products').insert([payload]));
+        if (error) throw error;
+        showStatus(id ? 'Article modifié' : 'Article ajouté', 'ok');
+        document.getElementById('productModal').classList.remove('open');
+        loadProducts();
+      } catch (err) {
+        showStatus(err.message || 'Erreur', 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer';
+      }
+    };
+
+    // ——— Sub-brands ———
+    async function loadSubbrands() {
+      const { data, error } = await supabaseClient.from('sub_brands').select('*').order('id');
+      if (error) { console.error(error); return; }
+      subBrandsCache = data || [];
+      fillSubSelect();
+      document.getElementById('subCount').textContent = '(' + subBrandsCache.length + ')';
+      const wrap = document.getElementById('subTableWrap');
+      const empty = document.getElementById('subEmpty');
+      if (!subBrandsCache.length) {
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      wrap.style.display = 'block';
+      empty.style.display = 'none';
+      document.getElementById('subBody').innerHTML = subBrandsCache.map(s => `
+        <tr>
+          <td><strong>${escapeHtml(s.name)}</strong></td>
+          <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
+          <td class="actions">
+            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${escapeHtml(s.name).replace(/'/g, "\\'")}')">+ Article</button>
+            <button class="btn btn-outline btn-sm" onclick="editSub(${s.id})">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSub(${s.id})">Suppr.</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function resetSubUpload() {
+      selectedSubFile = null;
+      document.getElementById('subLogoFile').value = '';
+      document.getElementById('subPreviewBox').classList.remove('show');
+      document.getElementById('subUploadZone').style.display = 'block';
+      document.getElementById('subLogo').value = '';
+    }
+    document.getElementById('subLogoFile').onchange = () => {
+      const f = document.getElementById('subLogoFile').files[0];
+      if (!f) return;
+      selectedSubFile = f;
+      document.getElementById('subPreviewImg').src = URL.createObjectURL(f);
+      document.getElementById('subPreviewBox').classList.add('show');
+      document.getElementById('subUploadZone').style.display = 'none';
+    };
+    document.getElementById('subRemoveImg').onclick = resetSubUpload;
+
+    document.getElementById('addSubBtn').onclick = () => {
+      document.getElementById('subModalTitle').textContent = 'Nouvelle sous-marque';
+      document.getElementById('subForm').reset();
+      document.getElementById('subId').value = '';
+      resetSubUpload();
+      document.getElementById('subModal').classList.add('open');
+    };
+    document.getElementById('cancelSub').onclick = () => document.getElementById('subModal').classList.remove('open');
+    document.getElementById('subModal').onclick = e => {
+      if (e.target.id === 'subModal') e.target.classList.remove('open');
+    };
+
+    window.editSub = async function(id) {
+      const { data, error } = await supabaseClient.from('sub_brands').select('*').eq('id', id).single();
+      if (error || !data) return;
+      document.getElementById('subModalTitle').textContent = 'Modifier';
+      document.getElementById('subId').value = data.id;
+      document.getElementById('subName').value = data.name;
+      document.getElementById('subDesc').value = data.description || '';
+      document.getElementById('subLogo').value = data.logo || '';
+      selectedSubFile = null;
+      document.getElementById('subLogoFile').value = '';
+      if (data.logo) {
+        document.getElementById('subPreviewImg').src = data.logo;
+        document.getElementById('subPreviewBox').classList.add('show');
+        document.getElementById('subUploadZone').style.display = 'none';
+      } else resetSubUpload();
+      document.getElementById('subModal').classList.add('open');
+    };
+
+    window.deleteSub = async function(id) {
+      if (!confirm('Supprimer cette sous-marque ?')) return;
+      const { error } = await supabaseClient.from('sub_brands').delete().eq('id', id);
+      if (error) showStatus(error.message, 'err');
+      else { showStatus('Sous-marque supprimée', 'ok'); loadSubbrands(); loadProducts(); }
+    };
+
+    document.getElementById('subForm').onsubmit = async e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        let logo = document.getElementById('subLogo').value || '';
+        if (selectedSubFile) logo = await compressImage(selectedSubFile);
+        const id = document.getElementById('subId').value;
+        const payload = {
+          name: document.getElementById('subName').value.trim(),
+          description: document.getElementById('subDesc').value.trim(),
+          logo
+        };
+        let error;
+        if (id) ({ error } = await supabaseClient.from('sub_brands').update(payload).eq('id', id));
+        else ({ error } = await supabaseClient.from('sub_brands').insert([payload]));
+        if (error) throw error;
+        showStatus(id ? 'Modifiée' : 'Créée', 'ok');
+        document.getElementById('subModal').classList.remove('open');
+        await loadSubbrands();
+        if (!id && confirm('Ajouter un article dans cette sous-marque ?')) {
+          const last = subBrandsCache[subBrandsCache.length - 1];
+          if (last) addProductToSub(last.id, last.name);
+        }
+      } catch (err) {
+        showStatus(err.message || 'Erreur', 'err');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

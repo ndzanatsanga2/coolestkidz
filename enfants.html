@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enfants — CoolestKidz</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="shop-page">
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img src="logo.png" alt="CoolestKidz">
+        <span>COOLEST<b>KIDZ</b></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="adultes.html" class="">Adultes</a>
+        <a href="enfants.html" class="active">Enfants</a>
+        <a href="sous-marques.html">Sous-marques</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-cta">
+        <button class="menu-btn" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html">Accueil</a>
+    <a href="adultes.html">Adultes</a>
+    <a href="enfants.html">Enfants</a>
+    <a href="sous-marques.html">Sous-marques</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <main>
+    <div class="container">
+      <div class="shop-head">
+        <h1>Enfants</h1>
+        <p>Vêtements confortables et résistants pour les plus jeunes.</p>
+      </div>
+      <div class="products-grid" id="productsGrid" data-category="Enfants">
+        <div class="loading">Chargement…</div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="">
+        <p>CoolestKidz<br>Mode premium camerounaise</p>
+      </div>
+      <div class="footer-col">
+        <h4>Boutique</h4>
+        <a href="adultes.html">Adultes</a>
+        <a href="enfants.html">Enfants</a>
+      </div>
+      <div class="footer-col">
+        <h4>Maison</h4>
+        <a href="index.html#apropos">À propos</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Suivre</h4>
+        <a href="https://instagram.com/coolestkidz" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 CoolestKidz</div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

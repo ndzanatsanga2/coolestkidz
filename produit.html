@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article — CoolestKidz</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="shop-page">
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img src="logo.png" alt="CoolestKidz">
+        <span>COOLEST<b>KIDZ</b></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+        <a href="adultes.html">Adultes</a>
+        <a href="enfants.html">Enfants</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-cta">
+        <button class="menu-btn" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html">Accueil</a>
+    <a href="adultes.html">Adultes</a>
+    <a href="enfants.html">Enfants</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <main>
+    <div class="pdp" id="pdp">
+      <div class="loading" style="grid-column:1/-1;padding:80px;text-align:center">Chargement…</div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="footer-bottom">© 2026 CoolestKidz</div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
