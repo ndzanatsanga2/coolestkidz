@@ -355,8 +355,8 @@
           <div class="field">
             <label>Catégorie</label>
             <select id="category">
-              <option value="Adultes">Adultes</option>
-              <option value="Enfants">Enfants</option>
+              <option value="Homme">Homme</option>
+              <option value="Femme">Femme</option>
             </select>
           </div>
           <div class="field">
@@ -597,7 +597,7 @@
       document.getElementById('productModalTitle').textContent = 'Modifier l’article';
       document.getElementById('productId').value = data.id;
       document.getElementById('name').value = data.name;
-      document.getElementById('category').value = data.category === 'Enfants' ? 'Enfants' : 'Adultes';
+      document.getElementById('category').value = data.category === 'Femme' ? 'Femme' : 'Homme';
       document.getElementById('price').value = data.price;
       document.getElementById('description').value = data.description || '';
       document.getElementById('featured').checked = !!data.featured;

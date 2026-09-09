@@ -18,10 +18,13 @@
 
   function normalizeCategory(cat) {
     var c = (cat || "").toLowerCase();
-    if (c.indexOf("enfant") !== -1 || c.indexOf("kids") !== -1 || c.indexOf("kid") !== -1) {
-      return "Enfants";
+    if (c.indexOf("femme") !== -1 || c.indexOf("women") !== -1 || c.indexOf("woman") !== -1) {
+      return "Femme";
     }
-    return "Adultes";
+    if (c.indexOf("enfant") !== -1 || c.indexOf("kids") !== -1 || c.indexOf("kid") !== -1) {
+      return "Femme"; // legacy mapping
+    }
+    return "Homme";
   }
 
   function qs(name) {
@@ -90,7 +93,7 @@
     })();
   }
 
-  // Shop grids (adultes.html / enfants.html)
+  // Shop grids (homme.html / femme.html)
   var grid = document.getElementById("productsGrid");
   if (grid && grid.dataset.category) {
     var cat = grid.dataset.category;
@@ -151,7 +154,7 @@
           encodeURIComponent("Bonjour, je suis intéressé par : " + data.name) +
           '" target="_blank" rel="noopener">Commander WhatsApp</a>' +
           '<a class="btn btn-outline-dark" href="' +
-          (cat === "Enfants" ? "enfants.html" : "adultes.html") +
+          (cat === "Femme" ? "femme.html" : "homme.html") +
           '">Retour</a>' +
           "</div></div>";
       } catch (e) {
