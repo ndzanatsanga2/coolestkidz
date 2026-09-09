@@ -151,7 +151,13 @@
           '<p class="desc">' + escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") + "</p>" +
           '<div class="pdp-actions">' +
           '<a class="btn btn-red" href="https://wa.me/237690100325?text=' +
-          encodeURIComponent("Bonjour, je suis intéressé par : " + data.name) +
+          encodeURIComponent(
+            "Bonjour CoolestKidz 👋\n\nJe suis intéressé(e) par cet article :\n" +
+            data.name +
+            "\nPrix : " + formatPrice(data.price) +
+            "\n\nLien de l'article :\n" +
+            (location.origin + "/produit.html?id=" + data.id)
+          ) +
           '" target="_blank" rel="noopener">Commander WhatsApp</a>' +
           '<a class="btn btn-outline-dark" href="' +
           (cat === "Femme" ? "femme.html" : "homme.html") +
