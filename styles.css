@@ -195,6 +195,36 @@ button, input, select, textarea { font-family: inherit; }
   pointer-events: none;
 }
 .hero-content { max-width: 780px; position: relative; z-index: 2; }
+
+/* Filigranes logo — très discrets, gris, léger mouvement */
+.wm {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.wm-i {
+  position: absolute;
+  width: 56px;
+  height: auto;
+  opacity: 0.045;
+  filter: grayscale(1) brightness(0.55);
+  user-select: none;
+  animation: wmFloat 18s ease-in-out infinite;
+}
+.wm-1 { top: 12%; left: 8%; width: 48px; animation-delay: 0s; }
+.wm-2 { top: 22%; right: 12%; width: 64px; animation-delay: -3s; animation-duration: 22s; }
+.wm-3 { top: 48%; left: 18%; width: 40px; animation-delay: -6s; animation-duration: 20s; }
+.wm-4 { top: 58%; right: 22%; width: 52px; animation-delay: -9s; animation-duration: 24s; }
+.wm-5 { bottom: 18%; left: 40%; width: 44px; animation-delay: -4s; animation-duration: 19s; }
+.wm-6 { top: 35%; left: 55%; width: 36px; animation-delay: -12s; animation-duration: 26s; opacity: 0.035; }
+@keyframes wmFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(10px, -14px) rotate(4deg); }
+  66% { transform: translate(-8px, 8px) rotate(-3deg); }
+}
+
 .hero-eyebrow {
   display: inline-block;
   font-size: 0.7rem;
