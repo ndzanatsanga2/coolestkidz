@@ -30,7 +30,6 @@
     return "Homme";
   }
 
-  /** true if product should appear on a given shop page (Homme / Femme) */
   function matchesShopCategory(productCat, shopCat) {
     var n = normalizeCategory(productCat);
     if (n === "Unisexe") return shopCat === "Homme" || shopCat === "Femme";
@@ -47,7 +46,6 @@
     return new URLSearchParams(location.search).get(name);
   }
 
-  // Header scroll
   var header = document.getElementById("header");
   if (header) {
     window.addEventListener("scroll", function () {
@@ -55,7 +53,6 @@
     }, { passive: true });
   }
 
-  // Mobile menu
   var menuBtn = document.getElementById("menuToggle");
   var navMobile = document.getElementById("navMobile");
   if (menuBtn && navMobile) {
@@ -86,7 +83,6 @@
     );
   }
 
-  // Featured products on landing
   var featured = document.getElementById("featuredGrid");
   if (featured) {
     (async function () {
@@ -106,26 +102,9 @@
         console.error(e);
         featured.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
+    })();
   }
 
-})();
-  }
-
-  // Shop grids (homme.html / femme.html)
   var grid = document.getElementById("productsGrid");
   if (grid && grid.dataset.category) {
     var cat = grid.dataset.category;
@@ -148,26 +127,9 @@
         console.error(e);
         grid.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
+    })();
   }
 
-})();
-  }
-
-  // Product detail page (produit.html)
   var pdp = document.getElementById("pdp");
   if (pdp) {
     var id = qs("id");
@@ -215,26 +177,9 @@
         console.error(e);
         pdp.innerHTML = '<div class="empty">Article introuvable.</div>';
       }
-    
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
+    })();
   }
 
-})();
-  }
-
-  // Sub-brands list (landing + sous-marques.html)
   var sbGridEl = document.getElementById("subbrandsGrid");
   if (sbGridEl) {
     (async function () {
@@ -271,26 +216,9 @@
         console.error(e);
         sbGridEl.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
+    })();
   }
 
-})();
-  }
-
-  // Sub-brand detail page
   var sbTitle = document.getElementById("sbTitle");
   if (sbTitle) {
     var sbId = qs("id");
@@ -324,26 +252,9 @@
         console.error(e);
         if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
       }
-    
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
+    })();
   }
 
-})();
-  }
-
-  // Contact form (simple feedback)
   var contactForm = document.getElementById("contactForm");
   if (contactForm) {
     contactForm.addEventListener("submit", function (e) {
@@ -362,19 +273,13 @@
     });
   }
 
-  // Brand video: hide placeholder when ready
-  var brandVideo = document.getElementById("brandVideo");
-  var videoPh = document.getElementById("videoPlaceholder");
-  if (brandVideo && videoPh) {
-    function hideVideoPh() {
-      videoPh.classList.add("is-hidden");
-      brandVideo.play().catch(function () {});
-    }
-    brandVideo.addEventListener("loadeddata", hideVideoPh);
-    brandVideo.addEventListener("canplay", hideVideoPh);
-    brandVideo.addEventListener("error", function () {
-      /* keep placeholder visible if file missing */
-    });
-  }
-
+  // Brand videos: autoplay loop (muted)
+  document.querySelectorAll(".brand-video").forEach(function (v) {
+    v.muted = true;
+    var tryPlay = function () {
+      v.play().catch(function () {});
+    };
+    v.addEventListener("loadeddata", tryPlay);
+    tryPlay();
+  });
 })();

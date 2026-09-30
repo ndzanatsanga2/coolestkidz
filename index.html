@@ -141,31 +141,27 @@
       <div class="section-head">
         <span class="section-tag">Film</span>
         <h2>CoolestKidz en image</h2>
-        <p>La campagne officielle de la marque.</p>
+        <p>Les films de la maison — faites défiler.</p>
       </div>
-      <div class="video-frame">
-        <!-- Remplacer media/campagne.mp4 quand la vidéo sera fournie -->
-        <video
-          id="brandVideo"
-          class="brand-video"
-          muted
-          loop
-          playsinline
-          autoplay
-          preload="metadata"
-          poster="media/campagne-poster.jpg"
-        >
-          <source src="media/campagne.mp4" type="video/mp4">
-          Votre navigateur ne prend pas en charge la vidéo.
-        </video>
-        <div class="video-placeholder" id="videoPlaceholder">
-          <div class="video-placeholder-inner">
-            <span class="video-icon" aria-hidden="true">▶</span>
-            <p>Vidéo publicitaire à venir</p>
-            <small>Elle tournera ici en boucle</small>
+      <div class="video-carousel" id="videoCarousel">
+        <article class="video-card">
+          <div class="video-frame">
+            <video class="brand-video" muted loop playsinline autoplay preload="metadata" poster="media/campagne-poster.jpg">
+              <source src="media/campagne.mp4" type="video/mp4">
+            </video>
           </div>
-        </div>
+          <p class="video-caption">Campagne rose</p>
+        </article>
+        <article class="video-card">
+          <div class="video-frame">
+            <video class="brand-video" muted loop playsinline autoplay preload="metadata" poster="media/campagne-2-poster.jpg">
+              <source src="media/campagne-2.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="video-caption">Drop tee noir</p>
+        </article>
       </div>
+      <p class="video-hint">← Faites défiler →</p>
     </div>
   </section>
 
