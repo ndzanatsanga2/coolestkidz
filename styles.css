@@ -258,7 +258,7 @@ button, input, select, textarea { font-family: inherit; }
 }
 .section-head p { color: var(--gray); font-size: 0.98rem; }
 
-/* Category portals — large clean cards */
+/* Category portals — photo cards Homme / Femme */
 .cat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -266,31 +266,47 @@ button, input, select, textarea { font-family: inherit; }
 }
 .cat-card {
   position: relative;
-  min-height: 380px;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 48px 40px;
+  padding: 0;
   background: var(--off);
-  border: 1px solid var(--line);
-  transition: border-color 0.3s, transform 0.35s var(--ease), box-shadow 0.35s;
+  border: none;
   overflow: hidden;
-}
-.cat-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(227,28,35,0.08), transparent 50%);
-  opacity: 0;
-  transition: opacity 0.35s;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s;
 }
 .cat-card:hover {
-  border-color: rgba(227,28,35,0.35);
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.18);
 }
-.cat-card:hover::before { opacity: 1; }
-.cat-card > * { position: relative; z-index: 1; }
+.cat-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  transition: transform 0.6s var(--ease);
+}
+.cat-card:hover .cat-bg { transform: scale(1.06); }
+.cat-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.72) 0%,
+    rgba(0,0,0,0.25) 45%,
+    rgba(0,0,0,0.1) 100%
+  );
+  z-index: 1;
+}
+.cat-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .cat-card small {
   font-size: 0.66rem;
   font-weight: 600;
@@ -304,17 +320,16 @@ button, input, select, textarea { font-family: inherit; }
   font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 16px;
-  color: var(--black);
+  color: #fff;
 }
 .cat-card span {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  border-bottom: 1.5px solid var(--black);
-  align-self: flex-start;
+  border-bottom: 1.5px solid #fff;
   padding-bottom: 3px;
-  color: var(--black);
+  color: #fff;
 }
 
 /* About */
@@ -736,7 +751,7 @@ button, input, select, textarea { font-family: inherit; }
   .nav { display: none; }
   .menu-btn { display: flex; }
   .cat-grid { grid-template-columns: 1fr; }
-  .cat-card { min-height: 280px; }
+  .cat-card { min-height: 380px; }
   .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .about-grid, .contact-grid, .detail-grid, .footer-grid {
     grid-template-columns: 1fr;
