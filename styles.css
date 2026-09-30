@@ -158,7 +158,7 @@ button, input, select, textarea { font-family: inherit; }
 .btn-outline-dark:hover { border-color: var(--black); }
 .btn-full { width: 100%; }
 
-/* ========== HERO (campaign photo background) ========== */
+/* ========== HERO (full-bleed, clean, white) ========== */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -167,37 +167,18 @@ button, input, select, textarea { font-family: inherit; }
   text-align: center;
   padding: calc(var(--header) + 48px) 24px 100px;
   position: relative;
-  overflow: hidden;
-  background: #1a1a1a;
+  background: var(--white);
 }
-/* Photo de campagne entière — non coupée */
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-color: #e8a0b8;
-  background-image: url('hero-bg.jpg');
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: blur(2px);
-  z-index: 0;
-}
-/* Voile clair pour lisibilité du texte (pas trop opaque) */
-.hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.58) 0%,
-    rgba(255,255,255,0.42) 45%,
-    rgba(255,255,255,0.55) 100%
-  );
-  z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(227,28,35,0.06), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 90% 70%, rgba(227,28,35,0.04), transparent);
   pointer-events: none;
 }
-.hero-content { max-width: 780px; position: relative; z-index: 2; }
+.hero-content { max-width: 780px; position: relative; z-index: 1; }
 .hero-eyebrow {
   display: inline-block;
   font-size: 0.7rem;
@@ -206,8 +187,6 @@ button, input, select, textarea { font-family: inherit; }
   text-transform: uppercase;
   color: var(--red);
   margin-bottom: 28px;
-  background: rgba(255,255,255,0.55);
-  padding: 8px 14px;
 }
 .hero h1 {
   font-size: clamp(3.2rem, 11vw, 6rem);
@@ -216,18 +195,16 @@ button, input, select, textarea { font-family: inherit; }
   letter-spacing: -0.04em;
   margin-bottom: 24px;
   color: var(--black);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
 }
 .hero h1 span { color: var(--red); }
 .hero p {
   font-size: 1.08rem;
-  color: #3a3a3a;
+  color: var(--gray);
   margin-bottom: 40px;
   line-height: 1.7;
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 }
 .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-scroll {
@@ -238,12 +215,11 @@ button, input, select, textarea { font-family: inherit; }
   font-size: 0.62rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #4a4a4a;
+  color: var(--gray);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  z-index: 2;
 }
 .hero-scroll i {
   width: 1px;
