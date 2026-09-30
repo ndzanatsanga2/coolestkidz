@@ -170,14 +170,17 @@ button, input, select, textarea { font-family: inherit; }
   overflow: hidden;
   background: #1a1a1a;
 }
-/* Photo de campagne — flou léger pour garder la marque lisible */
+/* Photo de campagne entière — non coupée */
 .hero::before {
   content: '';
   position: absolute;
-  inset: -12px;
-  background: url('hero-bg.jpg') center center / cover no-repeat;
-  filter: blur(3px);
-  transform: scale(1.04);
+  inset: 0;
+  background-color: #e8a0b8;
+  background-image: url('hero-bg.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: blur(2px);
   z-index: 0;
 }
 /* Voile clair pour lisibilité du texte (pas trop opaque) */
@@ -187,9 +190,9 @@ button, input, select, textarea { font-family: inherit; }
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(255,255,255,0.72) 0%,
-    rgba(255,255,255,0.55) 45%,
-    rgba(255,255,255,0.68) 100%
+    rgba(255,255,255,0.58) 0%,
+    rgba(255,255,255,0.42) 45%,
+    rgba(255,255,255,0.55) 100%
   );
   z-index: 1;
   pointer-events: none;
