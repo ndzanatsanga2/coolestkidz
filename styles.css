@@ -871,9 +871,9 @@ button, input, select, textarea { font-family: inherit; }
 .video-frame {
   position: relative;
   width: 100%;
-  max-width: 960px;
+  max-width: 420px;
   margin: 0 auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 16;
   background: #111;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -925,7 +925,7 @@ button, input, select, textarea { font-family: inherit; }
   text-transform: uppercase;
 }
 @media (max-width: 768px) {
-  .video-frame { aspect-ratio: 16 / 10; }
+  .video-frame { max-width: 320px; }
 }
 
 /* ========== RESPONSIVE ========== */
