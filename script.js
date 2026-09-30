@@ -18,13 +18,29 @@
 
   function normalizeCategory(cat) {
     var c = (cat || "").toLowerCase();
+    if (c.indexOf("uni") !== -1 || c.indexOf("mixte") !== -1 || c.indexOf("both") !== -1) {
+      return "Unisexe";
+    }
     if (c.indexOf("femme") !== -1 || c.indexOf("women") !== -1 || c.indexOf("woman") !== -1) {
       return "Femme";
     }
     if (c.indexOf("enfant") !== -1 || c.indexOf("kids") !== -1 || c.indexOf("kid") !== -1) {
-      return "Femme"; // legacy mapping
+      return "Femme";
     }
     return "Homme";
+  }
+
+  /** true if product should appear on a given shop page (Homme / Femme) */
+  function matchesShopCategory(productCat, shopCat) {
+    var n = normalizeCategory(productCat);
+    if (n === "Unisexe") return shopCat === "Homme" || shopCat === "Femme";
+    return n === shopCat;
+  }
+
+  function displayCategory(cat) {
+    var n = normalizeCategory(cat);
+    if (n === "Unisexe") return "Unisexe";
+    return n;
   }
 
   function qs(name) {
@@ -54,7 +70,7 @@
   }
 
   function productCard(p) {
-    var cat = normalizeCategory(p.category);
+    var cat = displayCategory(p.category);
     var img = p.image
       ? '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
       : '<div class="ph">' + escapeHtml(p.name) + "</div>";
@@ -107,7 +123,7 @@
         var res = await client.from("products").select("*").order("id", { ascending: false });
         if (res.error) throw res.error;
         var list = (res.data || []).filter(function (p) {
-          return normalizeCategory(p.category) === cat;
+          return matchesShopCategory(p.category, cat);
         });
         grid.innerHTML = list.length
           ? list.map(productCard).join("")
@@ -137,7 +153,7 @@
         var res = await client.from("products").select("*").eq("id", id).single();
         if (res.error || !res.data) throw res.error || new Error("not found");
         var data = res.data;
-        var cat = normalizeCategory(data.category);
+        var cat = displayCategory(data.category);
         document.title = (data.name || "Article") + " — CoolestKidz";
         var media = data.image
           ? '<img src="' + escapeHtml(data.image) + '" alt="">'

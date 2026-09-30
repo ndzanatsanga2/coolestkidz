@@ -357,6 +357,7 @@
             <select id="category">
               <option value="Homme">Homme</option>
               <option value="Femme">Femme</option>
+              <option value="Unisexe">Unisexe (Homme & Femme)</option>
             </select>
           </div>
           <div class="field">
@@ -597,7 +598,16 @@
       document.getElementById('productModalTitle').textContent = 'Modifier l’article';
       document.getElementById('productId').value = data.id;
       document.getElementById('name').value = data.name;
-      document.getElementById('category').value = data.category === 'Femme' ? 'Femme' : 'Homme';
+      const catVal = data.category || 'Homme';
+      if (catVal === 'Femme' || catVal === 'Unisexe' || catVal === 'Homme') {
+        document.getElementById('category').value = catVal;
+      } else if (/femme|women|woman|enfant|kids/i.test(catVal)) {
+        document.getElementById('category').value = 'Femme';
+      } else if (/uni|mixte|both/i.test(catVal)) {
+        document.getElementById('category').value = 'Unisexe';
+      } else {
+        document.getElementById('category').value = 'Homme';
+      }
       document.getElementById('price').value = data.price;
       document.getElementById('description').value = data.description || '';
       document.getElementById('featured').checked = !!data.featured;
