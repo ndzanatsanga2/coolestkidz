@@ -106,7 +106,23 @@
         console.error(e);
         featured.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    })();
+    
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
+})();
   }
 
   // Shop grids (homme.html / femme.html)
@@ -132,7 +148,23 @@
         console.error(e);
         grid.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    })();
+    
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
+})();
   }
 
   // Product detail page (produit.html)
@@ -183,7 +215,23 @@
         console.error(e);
         pdp.innerHTML = '<div class="empty">Article introuvable.</div>';
       }
-    })();
+    
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
+})();
   }
 
   // Sub-brands list (landing + sous-marques.html)
@@ -223,7 +271,23 @@
         console.error(e);
         sbGridEl.innerHTML = '<div class="empty">Impossible de charger.</div>';
       }
-    })();
+    
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
+})();
   }
 
   // Sub-brand detail page
@@ -260,7 +324,23 @@
         console.error(e);
         if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
       }
-    })();
+    
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
+})();
   }
 
   // Contact form (simple feedback)
@@ -281,4 +361,20 @@
       }
     });
   }
+
+  // Brand video: hide placeholder when ready
+  var brandVideo = document.getElementById("brandVideo");
+  var videoPh = document.getElementById("videoPlaceholder");
+  if (brandVideo && videoPh) {
+    function hideVideoPh() {
+      videoPh.classList.add("is-hidden");
+      brandVideo.play().catch(function () {});
+    }
+    brandVideo.addEventListener("loadeddata", hideVideoPh);
+    brandVideo.addEventListener("canplay", hideVideoPh);
+    brandVideo.addEventListener("error", function () {
+      /* keep placeholder visible if file missing */
+    });
+  }
+
 })();
