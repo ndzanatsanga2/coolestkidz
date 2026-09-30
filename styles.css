@@ -815,6 +815,56 @@ button, input, select, textarea { font-family: inherit; }
 }
 .modal-body p { color: var(--gray); font-size: 0.95rem; line-height: 1.65; }
 
+
+/* Filigranes dans le menu mobile ouvert */
+.nav-mobile {
+  position: relative;
+  overflow: hidden;
+}
+.nav-wm-mobile {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.nav-mobile > a {
+  position: relative;
+  z-index: 1;
+}
+.nav-wm-mobile .nav-wm-i {
+  top: auto;
+  transform: none;
+  animation: navWmMobile 18s ease-in-out infinite;
+}
+.nav-wm-mobile .m1  { top: 6%;  left: 8%;  width: 36px; opacity: 0.12; animation-delay: 0s; }
+.nav-wm-mobile .m2  { top: 8%;  right: 10%; left: auto; width: 28px; opacity: 0.1; animation-delay: -2s; }
+.nav-wm-mobile .m3  { top: 18%; left: 22%; width: 42px; opacity: 0.14; animation-delay: -4s; }
+.nav-wm-mobile .m4  { top: 22%; right: 18%; left: auto; width: 24px; opacity: 0.09; animation-delay: -1s; }
+.nav-wm-mobile .m5  { top: 32%; left: 6%;  width: 32px; opacity: 0.11; animation-delay: -6s; }
+.nav-wm-mobile .m6  { top: 35%; right: 8%; left: auto; width: 38px; opacity: 0.13; animation-delay: -3s; }
+.nav-wm-mobile .m7  { top: 45%; left: 28%; width: 26px; opacity: 0.1; animation-delay: -8s; }
+.nav-wm-mobile .m8  { top: 48%; right: 25%; left: auto; width: 34px; opacity: 0.12; animation-delay: -5s; }
+.nav-wm-mobile .m9  { top: 58%; left: 12%; width: 40px; opacity: 0.14; animation-delay: -7s; }
+.nav-wm-mobile .m10 { top: 60%; right: 12%; left: auto; width: 22px; opacity: 0.09; animation-delay: -9s; }
+.nav-wm-mobile .m11 { top: 70%; left: 35%; width: 30px; opacity: 0.11; animation-delay: -2s; }
+.nav-wm-mobile .m12 { top: 72%; right: 30%; left: auto; width: 36px; opacity: 0.13; animation-delay: -11s; }
+.nav-wm-mobile .m13 { top: 12%; left: 48%; width: 20px; opacity: 0.08; animation-delay: -4s; }
+.nav-wm-mobile .m14 { top: 28%; left: 55%; width: 44px; opacity: 0.12; animation-delay: -6s; }
+.nav-wm-mobile .m15 { top: 42%; left: 60%; width: 28px; opacity: 0.1; animation-delay: -1s; }
+.nav-wm-mobile .m16 { top: 55%; left: 48%; width: 32px; opacity: 0.11; animation-delay: -10s; }
+.nav-wm-mobile .m17 { top: 68%; left: 8%;  width: 24px; opacity: 0.09; animation-delay: -3s; }
+.nav-wm-mobile .m18 { top: 78%; left: 20%; width: 38px; opacity: 0.13; animation-delay: -8s; }
+.nav-wm-mobile .m19 { top: 80%; right: 15%; left: auto; width: 26px; opacity: 0.1; animation-delay: -5s; }
+.nav-wm-mobile .m20 { top: 88%; left: 40%; width: 34px; opacity: 0.12; animation-delay: -7s; }
+.nav-wm-mobile .m21 { top: 15%; left: 70%; width: 22px; opacity: 0.08; animation-delay: -12s; }
+.nav-wm-mobile .m22 { top: 50%; left: 75%; width: 30px; opacity: 0.11; animation-delay: -4s; }
+.nav-wm-mobile .m23 { top: 85%; left: 60%; width: 28px; opacity: 0.09; animation-delay: -9s; }
+.nav-wm-mobile .m24 { top: 40%; left: 40%; width: 48px; opacity: 0.14; animation-delay: -2s; }
+@keyframes navWmMobile {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(8px, -10px) rotate(5deg); }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1024px) {
   .products-grid { grid-template-columns: repeat(3, 1fr); }
