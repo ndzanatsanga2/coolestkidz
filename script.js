@@ -56,13 +56,32 @@
   var menuBtn = document.getElementById("menuToggle");
   var navMobile = document.getElementById("navMobile");
   if (menuBtn && navMobile) {
+    var backdrop = document.getElementById("navBackdrop");
+    if (!backdrop) {
+      backdrop = document.createElement("button");
+      backdrop.type = "button";
+      backdrop.id = "navBackdrop";
+      backdrop.className = "nav-backdrop";
+      backdrop.setAttribute("aria-label", "Fermer le menu");
+      document.body.appendChild(backdrop);
+    }
+    function closeMenu() {
+      navMobile.classList.remove("open");
+      backdrop.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+    function openMenu() {
+      navMobile.classList.add("open");
+      backdrop.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
     menuBtn.addEventListener("click", function () {
-      navMobile.classList.toggle("open");
+      if (navMobile.classList.contains("open")) closeMenu();
+      else openMenu();
     });
+    backdrop.addEventListener("click", closeMenu);
     navMobile.querySelectorAll("a").forEach(function (a) {
-      a.addEventListener("click", function () {
-        navMobile.classList.remove("open");
-      });
+      a.addEventListener("click", closeMenu);
     });
   }
 
