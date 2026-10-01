@@ -255,6 +255,68 @@
     .preview { margin-top: 12px; display: none; }
     .preview.show { display: block; }
     .preview img { max-height: 160px; max-width: 100%; object-fit: contain; background: var(--warm); }
+
+    .vitrine-help {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      max-width: 560px;
+      line-height: 1.5;
+    }
+    .vitrine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 720px) {
+      .vitrine-grid { grid-template-columns: 1fr; }
+    }
+    .vitrine-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 20px;
+      color: var(--ink);
+    }
+    .vitrine-card h3 {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+    .vitrine-preview {
+      margin-bottom: 12px;
+      background: var(--warm);
+      border: 1px solid var(--line);
+      min-height: 180px;
+    }
+    .vitrine-preview img {
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      display: block;
+    }
+    .vitrine-upload {
+      display: block;
+      position: relative;
+      border: 1px dashed var(--line);
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .vitrine-upload input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .vitrine-card .btn { width: 100%; }
+
     .preview button {
       margin-top: 8px; background: none; border: none; color: var(--danger);
       font-size: 0.8rem; cursor: pointer; font-family: inherit;
@@ -339,44 +401,43 @@
         </div>
         <div class="empty" id="subEmpty" style="display:none">Aucune sous-marque.</div>
       </div>
-    </div>
-  </div>
 
-  
       <!-- Vitrine images panel -->
       <div class="panel" id="panel-vitrine">
         <div class="toolbar">
           <h2>Images collections</h2>
         </div>
-        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:24px;max-width:560px">
+        <p class="vitrine-help">
           Ces photos apparaissent sur la page d’accueil dans les cartes <strong>Homme</strong> et <strong>Femme</strong>.
-          Formats recommandés : JPG ou PNG, portrait, environ 800×1000 px.
+          Formats : JPG ou PNG, portrait, environ 800×1000 px.
         </p>
-        <div class="vitrine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-          <div class="vitrine-card" style="background:var(--paper);border:1px solid var(--line);padding:20px">
-            <h3 style="font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">Collection Homme</h3>
-            <div class="preview show" id="vHommePreviewBox" style="margin:0 0 12px">
-              <img id="vHommePreview" src="homme-card.jpg" alt="Homme" style="width:100%;max-height:280px;object-fit:cover;background:var(--warm)">
+        <div class="vitrine-grid">
+          <div class="vitrine-card">
+            <h3>Collection Homme</h3>
+            <div class="vitrine-preview">
+              <img id="vHommePreview" src="homme-card.jpg" alt="Homme">
             </div>
-            <div class="upload" id="vHommeZone" style="position:relative;border:1px dashed var(--line);padding:16px;text-align:center;cursor:pointer">
-              <input type="file" id="vHommeFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
-              <p style="font-size:0.85rem;color:var(--muted)">Changer la photo Homme</p>
-            </div>
-            <button class="btn" id="vHommeSave" style="margin-top:12px;width:100%">Enregistrer Homme</button>
+            <label class="vitrine-upload">
+              <input type="file" id="vHommeFile" accept="image/*">
+              <span>Changer la photo Homme</span>
+            </label>
+            <button type="button" class="btn" id="vHommeSave">Enregistrer Homme</button>
           </div>
-          <div class="vitrine-card" style="background:var(--paper);border:1px solid var(--line);padding:20px">
-            <h3 style="font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">Collection Femme</h3>
-            <div class="preview show" id="vFemmePreviewBox" style="margin:0 0 12px">
-              <img id="vFemmePreview" src="femme-card.jpg" alt="Femme" style="width:100%;max-height:280px;object-fit:cover;background:var(--warm)">
+          <div class="vitrine-card">
+            <h3>Collection Femme</h3>
+            <div class="vitrine-preview">
+              <img id="vFemmePreview" src="femme-card.jpg" alt="Femme">
             </div>
-            <div class="upload" id="vFemmeZone" style="position:relative;border:1px dashed var(--line);padding:16px;text-align:center;cursor:pointer">
-              <input type="file" id="vFemmeFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
-              <p style="font-size:0.85rem;color:var(--muted)">Changer la photo Femme</p>
-            </div>
-            <button class="btn" id="vFemmeSave" style="margin-top:12px;width:100%">Enregistrer Femme</button>
+            <label class="vitrine-upload">
+              <input type="file" id="vFemmeFile" accept="image/*">
+              <span>Changer la photo Femme</span>
+            </label>
+            <button type="button" class="btn" id="vFemmeSave">Enregistrer Femme</button>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
   <!-- Product modal -->
   <div class="overlay" id="productModal">
@@ -555,7 +616,11 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+        const pane = document.getElementById('panel-' + tab.dataset.tab);
+        if (pane) {
+          pane.classList.add('active');
+          setTimeout(() => pane.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+        }
       };
     });
 
