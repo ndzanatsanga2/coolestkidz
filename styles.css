@@ -1309,3 +1309,67 @@ button, input, select, textarea { font-family: inherit; }
 @media (max-width: 600px) {
   .sb-hero img { max-height: 55vh; }
 }
+
+/* PDP gallery — scroll variantes */
+.pdp-gallery {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 0;
+  width: 100%;
+  scrollbar-width: none;
+}
+.pdp-gallery::-webkit-scrollbar { display: none; }
+.pdp-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  position: relative;
+  aspect-ratio: 3/4;
+  background: var(--off);
+}
+.pdp-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pdp-slide .ph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+}
+.pdp-slide-label {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+.pdp-swipe-hint {
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-top: 10px;
+}
+.pdp-variant-label {
+  font-size: 0.85rem;
+  color: var(--gray);
+  margin: -8px 0 12px;
+  min-height: 1.2em;
+}
+.pdp-info .price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  transition: opacity 0.2s;
+}

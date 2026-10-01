@@ -168,30 +168,119 @@
         var data = res.data;
         var cat = displayCategory(data.category);
         document.title = (data.name || "Article") + " — CoolestKidz";
-        var media = data.image
-          ? '<img src="' + escapeHtml(data.image) + '" alt="">'
-          : '<div class="ph">' + escapeHtml(data.name) + "</div>";
+        var gal = data.gallery;
+        if (typeof gal === "string") {
+          try { gal = JSON.parse(gal); } catch (e) { gal = []; }
+        }
+        if (!Array.isArray(gal) || !gal.length) {
+          gal = data.image
+            ? [{ image: data.image, label: "", price: data.price }]
+            : [];
+        }
+        var slides = gal.map(function (v) {
+          var src = v.image || "";
+          var lab = v.label
+            ? '<span class="pdp-slide-label">' + escapeHtml(v.label) + "</span>"
+            : "";
+          var pr = v.price != null ? v.price : data.price;
+          return (
+            '<div class="pdp-slide" data-price="' + pr + '" data-label="' + escapeHtml(v.label || "") + '">' +
+            (src
+              ? '<img src="' + escapeHtml(src) + '" alt="">'
+              : '<div class="ph">' + escapeHtml(data.name) + "</div>") +
+            lab +
+            "</div>"
+          );
+        }).join("");
+        if (!slides) {
+          slides =
+            '<div class="pdp-slide" data-price="' +
+            data.price +
+            '"><div class="ph">' +
+            escapeHtml(data.name) +
+            "</div></div>";
+        }
+        var firstPrice = gal[0] && gal[0].price != null ? gal[0].price : data.price;
+        var firstLabel = gal[0] && gal[0].label ? gal[0].label : "";
         pdp.innerHTML =
-          '<div class="pdp-media">' + media + "</div>" +
+          '<div class="pdp-media">' +
+          '<div class="pdp-gallery" id="pdpGallery">' +
+          slides +
+          "</div>" +
+          (gal.length > 1
+            ? '<p class="pdp-swipe-hint">← Glisser pour voir les variantes →</p>'
+            : "") +
+          "</div>" +
           '<div class="pdp-info">' +
-          '<div class="cat">' + escapeHtml(cat) + "</div>" +
-          "<h1>" + escapeHtml(data.name) + "</h1>" +
-          '<div class="price">' + formatPrice(data.price) + "</div>" +
-          '<p class="desc">' + escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") + "</p>" +
+          '<div class="cat">' +
+          escapeHtml(cat) +
+          "</div>" +
+          "<h1>" +
+          escapeHtml(data.name) +
+          "</h1>" +
+          '<div class="price" id="pdpPrice">' +
+          formatPrice(firstPrice) +
+          "</div>" +
+          '<p class="pdp-variant-label" id="pdpVariantLabel">' +
+          escapeHtml(firstLabel) +
+          "</p>" +
+          '<p class="desc">' +
+          escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") +
+          "</p>" +
           '<div class="pdp-actions">' +
-          '<a class="btn btn-red" href="https://wa.me/237690100325?text=' +
-          encodeURIComponent(
-            "Bonjour CoolestKidz 👋\n\nJe suis intéressé(e) par cet article :\n" +
-            data.name +
-            "\nPrix : " + formatPrice(data.price) +
-            "\n\nLien de l'article :\n" +
-            (location.origin + "/produit.html?id=" + data.id)
-          ) +
-          '" target="_blank" rel="noopener">Commander WhatsApp</a>' +
+          '<a class="btn btn-red" id="pdpWa" href="#" target="_blank" rel="noopener">Commander WhatsApp</a>' +
           '<a class="btn btn-outline-dark" href="' +
           (cat === "Femme" ? "femme.html" : "homme.html") +
           '">Retour</a>' +
           "</div></div>";
+
+        function updatePdpVariant(price, label) {
+          var priceEl = document.getElementById("pdpPrice");
+          var labEl = document.getElementById("pdpVariantLabel");
+          var wa = document.getElementById("pdpWa");
+          if (priceEl) priceEl.textContent = formatPrice(price);
+          if (labEl) labEl.textContent = label || "";
+          if (wa) {
+            var msg =
+              "Bonjour CoolestKidz 👋\n\nJe suis intéressé(e) par cet article :\n" +
+              data.name +
+              (label ? "\nVariante : " + label : "") +
+              "\nPrix : " +
+              formatPrice(price) +
+              "\n\nLien de l'article :\n" +
+              (location.origin + "/produit.html?id=" + data.id);
+            wa.href =
+              "https://wa.me/237690100325?text=" + encodeURIComponent(msg);
+          }
+        }
+        updatePdpVariant(firstPrice, firstLabel);
+
+        var galleryEl = document.getElementById("pdpGallery");
+        if (galleryEl && gal.length > 1) {
+          var slidesEls = galleryEl.querySelectorAll(".pdp-slide");
+          function syncFromScroll() {
+            var mid = galleryEl.scrollLeft + galleryEl.clientWidth / 2;
+            var best = slidesEls[0];
+            var bestDist = Infinity;
+            slidesEls.forEach(function (sl) {
+              var center = sl.offsetLeft + sl.offsetWidth / 2;
+              var d = Math.abs(center - mid);
+              if (d < bestDist) {
+                bestDist = d;
+                best = sl;
+              }
+            });
+            if (best) {
+              updatePdpVariant(
+                Number(best.getAttribute("data-price")) || data.price,
+                best.getAttribute("data-label") || ""
+              );
+            }
+          }
+          galleryEl.addEventListener("scroll", syncFromScroll, {
+            passive: true,
+          });
+        }
       } catch (e) {
         console.error(e);
         pdp.innerHTML = '<div class="empty">Article introuvable.</div>';

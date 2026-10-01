@@ -317,6 +317,41 @@
     }
     .vitrine-card .btn { width: 100%; }
 
+
+    .variants-list { display: flex; flex-direction: column; gap: 12px; }
+    .variant-row {
+      border: 1px solid var(--line);
+      padding: 12px;
+      background: var(--soft);
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .variant-row img {
+      width: 72px; height: 90px; object-fit: cover; background: #eee; display: block;
+    }
+    .variant-row .v-ph {
+      width: 72px; height: 90px; background: #eee; display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: var(--muted); text-align: center;
+    }
+    .variant-row .v-fields { display: flex; flex-direction: column; gap: 6px; }
+    .variant-row input[type="text"],
+    .variant-row input[type="number"] {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--line); font-size: 0.85rem;
+    }
+    .variant-row .v-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .variant-row .v-actions label {
+      font-size: 0.75rem; text-transform: none; letter-spacing: 0; color: var(--muted);
+      position: relative; cursor: pointer; border: 1px dashed var(--line); padding: 6px 10px;
+    }
+    .variant-row .v-actions input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .variant-row .v-del {
+      background: none; border: none; color: var(--danger); font-size: 0.8rem; cursor: pointer; font-family: inherit;
+    }
+
     .preview button {
       margin-top: 8px; background: none; border: none; color: var(--danger);
       font-size: 0.8rem; cursor: pointer; font-family: inherit;
@@ -475,16 +510,14 @@
           <textarea id="description" placeholder="Matière, coupe, détails…"></textarea>
         </div>
         <div class="field">
-          <label>Photo</label>
-          <div class="upload" id="uploadZone">
-            <input type="file" id="imageFile" accept="image/*">
-            <p>Choisir une photo</p>
-            <p class="hint">JPG, PNG · max 8 Mo</p>
-          </div>
-          <div class="preview" id="previewBox">
-            <img id="previewImg" alt="">
-            <button type="button" id="removeImg">Supprimer</button>
-          </div>
+          <label>Photos / variantes</label>
+          <p style="font-size:0.78rem;color:var(--muted);margin:-4px 0 10px">Plusieurs vues ou couleurs du même article. Chaque photo peut avoir un prix différent. Sur le site, on scroll et le prix suit.</p>
+          <input type="hidden" id="existingImage">
+          <div id="variantsList" class="variants-list"></div>
+          <button type="button" class="btn btn-outline" id="addVariantBtn" style="width:100%;margin-top:8px">+ Ajouter une photo</button>
+          <!-- compat anciens handlers -->
+          <input type="file" id="imageFile" accept="image/*" style="display:none">
+          <div class="preview" id="previewBox" style="display:none"><img id="previewImg" alt=""><button type="button" id="removeImg">Supprimer</button></div>
         </div>
         <div class="check">
           <input type="checkbox" id="featured">
@@ -665,7 +698,61 @@
     }
 
     function resetProductUpload() {
-      selectedFile = null;
+      
+    // ——— Product variants (multi photos + prix) ———
+    let productVariants = []; // { image, label, price, file? }
+
+    function renderVariants() {
+      const box = document.getElementById('variantsList');
+      if (!box) return;
+      if (!productVariants.length) {
+        box.innerHTML = '<p style="font-size:0.85rem;color:var(--muted)">Aucune photo. Clique sur « + Ajouter une photo ».</p>';
+        return;
+      }
+      box.innerHTML = productVariants.map((v, i) => `
+        <div class="variant-row" data-i="${i}">
+          ${v.image ? `<img src="${v.image}" alt="">` : `<div class="v-ph">Photo</div>`}
+          <div class="v-fields">
+            <input type="text" placeholder="Libellé (ex: Noir, Vue dos…)" value="${escapeHtml(v.label || '')}" data-field="label" data-i="${i}">
+            <input type="number" placeholder="Prix FCFA (optionnel)" min="0" step="500" value="${v.price != null && v.price !== '' ? v.price : ''}" data-field="price" data-i="${i}">
+            <div class="v-actions">
+              <label>Choisir photo<input type="file" accept="image/*" data-file="${i}"></label>
+              <button type="button" class="v-del" data-del="${i}">Supprimer</button>
+            </div>
+          </div>
+        </div>`).join('');
+      box.querySelectorAll('[data-field]').forEach(inp => {
+        inp.onchange = inp.oninput = () => {
+          const i = +inp.dataset.i;
+          const f = inp.dataset.field;
+          productVariants[i][f] = inp.value;
+        };
+      });
+      box.querySelectorAll('[data-file]').forEach(inp => {
+        inp.onchange = async () => {
+          const i = +inp.dataset.file;
+          const file = inp.files[0];
+          if (!file) return;
+          const url = await compressImage(file, 1000, 0.78);
+          productVariants[i].image = url;
+          productVariants[i].file = null;
+          renderVariants();
+        };
+      });
+      box.querySelectorAll('[data-del]').forEach(btn => {
+        btn.onclick = () => {
+          productVariants.splice(+btn.dataset.del, 1);
+          renderVariants();
+        };
+      });
+    }
+
+    document.getElementById('addVariantBtn').onclick = () => {
+      productVariants.push({ image: '', label: '', price: '' });
+      renderVariants();
+    };
+
+    selectedFile = null;
       document.getElementById('imageFile').value = '';
       document.getElementById('previewBox').classList.remove('show');
       document.getElementById('uploadZone').style.display = 'block';
@@ -719,14 +806,17 @@
       selectedFile = null;
       document.getElementById('imageFile').value = '';
       fillSubSelect(data.sub_brand_id);
-      if (data.image) {
-        document.getElementById('previewImg').src = data.image;
-        document.getElementById('previewBox').classList.add('show');
-        document.getElementById('uploadZone').style.display = 'none';
+      let gal = data.gallery;
+      if (typeof gal === 'string') { try { gal = JSON.parse(gal); } catch (e) { gal = []; } }
+      if (!Array.isArray(gal)) gal = [];
+      if (gal.length) {
+        productVariants = gal.map(v => ({ image: v.image || '', label: v.label || '', price: v.price != null ? v.price : '' }));
+      } else if (data.image) {
+        productVariants = [{ image: data.image, label: '', price: data.price || '' }];
       } else {
-        document.getElementById('previewBox').classList.remove('show');
-        document.getElementById('uploadZone').style.display = 'block';
+        productVariants = [{ image: '', label: '', price: '' }];
       }
+      renderVariants();
       document.getElementById('productModal').classList.add('open');
     };
 
@@ -752,17 +842,31 @@
       btn.disabled = true;
       btn.textContent = '…';
       try {
-        let imageUrl = document.getElementById('existingImage').value || '';
-        if (selectedFile) imageUrl = await compressImage(selectedFile);
         const subVal = document.getElementById('productSubBrand').value;
+        const basePrice = parseInt(document.getElementById('price').value, 10) || 0;
+        const gallery = productVariants
+          .filter(v => v.image)
+          .map(v => ({
+            image: v.image,
+            label: (v.label || '').trim(),
+            price: (v.price !== '' && v.price != null) ? parseInt(v.price, 10) : basePrice
+          }));
+        if (!gallery.length) {
+          showStatus('Ajoute au moins une photo', 'err');
+          btn.disabled = false;
+          btn.textContent = 'Enregistrer';
+          return;
+        }
+        const imageUrl = gallery[0].image;
         const payload = {
           name: document.getElementById('name').value.trim(),
           category: document.getElementById('category').value,
-          price: parseInt(document.getElementById('price').value, 10) || 0,
+          price: basePrice,
           description: document.getElementById('description').value.trim(),
           image: imageUrl,
+          gallery: gallery,
           featured: document.getElementById('featured').checked,
-          sub_brand_id: subVal ? parseInt(subVal, 10) : null
+          sub_brand_id: subVal ? Number(subVal) : null
         };
         const id = document.getElementById('productId').value;
         let error;
