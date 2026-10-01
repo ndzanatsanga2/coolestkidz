@@ -239,15 +239,6 @@
         var descEl = document.getElementById("sbDesc");
         if (descEl) descEl.textContent = sb.description || "";
         document.title = sb.name + " — CoolestKidz";
-        var cover = document.getElementById("sbCover");
-        var hero = document.getElementById("sbHero");
-        if (cover && hero && sb.logo) {
-          cover.src = sb.logo;
-          cover.alt = sb.name || "";
-          hero.hidden = false;
-        } else if (hero) {
-          hero.hidden = true;
-        }
         var res2 = await client
           .from("products")
           .select("*")
