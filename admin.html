@@ -291,6 +291,7 @@
       <div class="tabs">
         <button class="tab active" data-tab="products">Articles</button>
         <button class="tab" data-tab="subs">Sous-marques</button>
+        <button class="tab" data-tab="vitrine">Images vitrine</button>
       </div>
 
       <!-- Products panel -->
@@ -339,6 +340,42 @@
       </div>
     </div>
   </div>
+
+  
+      <!-- Vitrine images panel -->
+      <div class="panel" id="panel-vitrine">
+        <div class="toolbar">
+          <h2>Images collections</h2>
+        </div>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:24px;max-width:560px">
+          Ces photos apparaissent sur la page d’accueil dans les cartes <strong>Homme</strong> et <strong>Femme</strong>.
+          Formats recommandés : JPG ou PNG, portrait, environ 800×1000 px.
+        </p>
+        <div class="vitrine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="vitrine-card" style="background:var(--paper);border:1px solid var(--line);padding:20px">
+            <h3 style="font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">Collection Homme</h3>
+            <div class="preview show" id="vHommePreviewBox" style="margin:0 0 12px">
+              <img id="vHommePreview" src="homme-card.jpg" alt="Homme" style="width:100%;max-height:280px;object-fit:cover;background:var(--warm)">
+            </div>
+            <div class="upload" id="vHommeZone" style="position:relative;border:1px dashed var(--line);padding:16px;text-align:center;cursor:pointer">
+              <input type="file" id="vHommeFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+              <p style="font-size:0.85rem;color:var(--muted)">Changer la photo Homme</p>
+            </div>
+            <button class="btn" id="vHommeSave" style="margin-top:12px;width:100%">Enregistrer Homme</button>
+          </div>
+          <div class="vitrine-card" style="background:var(--paper);border:1px solid var(--line);padding:20px">
+            <h3 style="font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px">Collection Femme</h3>
+            <div class="preview show" id="vFemmePreviewBox" style="margin:0 0 12px">
+              <img id="vFemmePreview" src="femme-card.jpg" alt="Femme" style="width:100%;max-height:280px;object-fit:cover;background:var(--warm)">
+            </div>
+            <div class="upload" id="vFemmeZone" style="position:relative;border:1px dashed var(--line);padding:16px;text-align:center;cursor:pointer">
+              <input type="file" id="vFemmeFile" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+              <p style="font-size:0.85rem;color:var(--muted)">Changer la photo Femme</p>
+            </div>
+            <button class="btn" id="vFemmeSave" style="margin-top:12px;width:100%">Enregistrer Femme</button>
+          </div>
+        </div>
+      </div>
 
   <!-- Product modal -->
   <div class="overlay" id="productModal">
@@ -489,7 +526,7 @@
     if (sessionStorage.getItem('ck_admin_pwd') === PASSWORD) {
       loginScreen.style.display = 'none';
       adminShell.style.display = 'block';
-      if (initSupabase()) { loadProducts(); loadSubbrands(); }
+      if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); }
     }
     document.getElementById('loginBtn').onclick = () => {
       if (document.getElementById('passwordInput').value === PASSWORD) {
@@ -497,7 +534,7 @@
         document.getElementById('loginError').style.display = 'none';
         loginScreen.style.display = 'none';
         adminShell.style.display = 'block';
-        if (initSupabase()) { loadProducts(); loadSubbrands(); }
+        if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); }
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
@@ -789,6 +826,75 @@
         btn.disabled = false;
       }
     };
+
+    // ——— Vitrine images (Homme / Femme cards) ———
+    let vHommeFile = null;
+    let vFemmeFile = null;
+
+    async function loadVitrine() {
+      try {
+        const { data, error } = await supabaseClient.from('site_settings').select('key,value');
+        if (error) {
+          console.warn('site_settings:', error.message);
+          return;
+        }
+        (data || []).forEach(row => {
+          if (row.key === 'cat_homme_image' && row.value) {
+            document.getElementById('vHommePreview').src = row.value;
+          }
+          if (row.key === 'cat_femme_image' && row.value) {
+            document.getElementById('vFemmePreview').src = row.value;
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    document.getElementById('vHommeFile').onchange = () => {
+      const f = document.getElementById('vHommeFile').files[0];
+      if (!f) return;
+      vHommeFile = f;
+      document.getElementById('vHommePreview').src = URL.createObjectURL(f);
+    };
+    document.getElementById('vFemmeFile').onchange = () => {
+      const f = document.getElementById('vFemmeFile').files[0];
+      if (!f) return;
+      vFemmeFile = f;
+      document.getElementById('vFemmePreview').src = URL.createObjectURL(f);
+    };
+
+    async function saveVitrineImage(key, fileRef, btnId) {
+      const btn = document.getElementById(btnId);
+      if (!fileRef) {
+        showStatus('Choisis d’abord une nouvelle photo', 'err');
+        return;
+      }
+      btn.disabled = true;
+      const old = btn.textContent;
+      btn.textContent = '…';
+      try {
+        const imageUrl = await compressImage(fileRef, 1000, 0.8);
+        const { error } = await supabaseClient.from('site_settings').upsert({
+          key: key,
+          value: imageUrl,
+          updated_at: new Date().toISOString()
+        });
+        if (error) throw error;
+        showStatus('Image enregistrée — visible sur le site', 'ok');
+        if (key === 'cat_homme_image') vHommeFile = null;
+        if (key === 'cat_femme_image') vFemmeFile = null;
+      } catch (err) {
+        showStatus(err.message || 'Erreur enregistrement. As-tu créé la table site_settings ?', 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = old;
+      }
+    }
+
+    document.getElementById('vHommeSave').onclick = () => saveVitrineImage('cat_homme_image', vHommeFile, 'vHommeSave');
+    document.getElementById('vFemmeSave').onclick = () => saveVitrineImage('cat_femme_image', vFemmeFile, 'vFemmeSave');
+
   </script>
 </body>
 </html>

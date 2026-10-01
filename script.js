@@ -273,6 +273,34 @@
     });
   }
 
+
+  // Images cartes Homme / Femme (admin configurable)
+  (async function () {
+    var hommeBg = document.getElementById("catHommeBg");
+    var femmeBg = document.getElementById("catFemmeBg");
+    if (!hommeBg && !femmeBg) return;
+    var client = getClient();
+    if (!client) return;
+    try {
+      var res = await client.from("site_settings").select("key,value").in("key", [
+        "cat_homme_image",
+        "cat_femme_image"
+      ]);
+      if (res.error || !res.data) return;
+      res.data.forEach(function (row) {
+        if (!row.value) return;
+        if (row.key === "cat_homme_image" && hommeBg) {
+          hommeBg.style.backgroundImage = "url('" + row.value + "')";
+        }
+        if (row.key === "cat_femme_image" && femmeBg) {
+          femmeBg.style.backgroundImage = "url('" + row.value + "')";
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  })();
+
   // Brand videos: autoplay loop (muted)
   document.querySelectorAll(".brand-video").forEach(function (v) {
     v.muted = true;
