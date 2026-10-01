@@ -605,10 +605,21 @@ button, input, select, textarea { font-family: inherit; }
   transform: translateY(-4px);
   box-shadow: 0 12px 28px var(--shadow);
 }
+.sb-card-img {
+  width: 100%;
+  background: var(--off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.sb-card-img img,
 .sb-card img {
   width: 100%;
-  height: 220px;
-  object-fit: cover;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+  object-position: center;
   margin: 0;
   border-radius: 0;
   display: block;
@@ -616,7 +627,7 @@ button, input, select, textarea { font-family: inherit; }
 }
 .sb-card .ph {
   width: 100%;
-  height: 220px;
+  min-height: 200px;
   margin: 0;
   background: var(--off);
   display: flex;
@@ -626,6 +637,21 @@ button, input, select, textarea { font-family: inherit; }
   font-size: 2rem;
   color: var(--gray);
   border-radius: 0;
+}
+.sb-card-body {
+  padding: 16px 18px 18px;
+}
+.sb-card-body h3 {
+  margin: 0 0 6px !important;
+}
+.sb-card-body p {
+  margin: 0 0 12px !important;
+}
+.sb-card-cta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--red);
 }
 .sb-card h3 {
   font-size: 0.92rem;
@@ -1155,17 +1181,18 @@ button, input, select, textarea { font-family: inherit; }
 /* Sous-marque detail */
 .sb-hero {
   width: 100%;
-  max-height: 420px;
-  overflow: hidden;
   margin-bottom: 28px;
   border: 1px solid var(--line);
   background: var(--off);
+  overflow: hidden;
 }
 .sb-hero img {
   width: 100%;
-  height: 360px;
-  object-fit: cover;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
   display: block;
+  margin: 0 auto;
 }
 .sb-products-title {
   font-size: 0.75rem;
@@ -1178,11 +1205,23 @@ button, input, select, textarea { font-family: inherit; }
 .sb-card {
   overflow: hidden;
 }
+.sb-card-img img,
 .sb-card img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
+}
+.sb-hero {
+  max-height: none !important;
+  overflow: visible;
+}
+.sb-hero img {
+  width: 100%;
+  height: auto !important;
+  max-height: 70vh;
+  object-fit: contain !important;
+  background: var(--off);
 }
 @media (max-width: 600px) {
-  .sb-hero img { height: 240px; }
+  .sb-hero img { max-height: 55vh; }
 }
