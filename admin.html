@@ -328,6 +328,7 @@
           <table>
             <thead>
               <tr>
+                <th>Image</th>
                 <th>Nom</th>
                 <th>Description</th>
                 <th></th>
@@ -452,11 +453,12 @@
           <textarea id="subDesc"></textarea>
         </div>
         <div class="field">
-          <label>Logo / image</label>
+          <label>Image illustrative *</label>
+          <p style="font-size:0.78rem;color:var(--muted);margin:-6px 0 10px">Affichée sur la carte et en bannière de la sous-marque. Les articles liés s’affichent en dessous.</p>
           <div class="upload" id="subUploadZone">
             <input type="file" id="subLogoFile" accept="image/*">
-            <p>Choisir un logo</p>
-            <p class="hint">JPG, PNG · max 8 Mo</p>
+            <p>Choisir une image</p>
+            <p class="hint">JPG, PNG · portrait recommandé</p>
           </div>
           <div class="preview" id="subPreviewBox">
             <img id="subPreviewImg" alt="">
@@ -731,15 +733,15 @@
       empty.style.display = 'none';
       document.getElementById('subBody').innerHTML = subBrandsCache.map(s => `
         <tr>
+          <td>${s.logo ? `<img class="thumb" src="${escapeHtml(s.logo)}" alt="">` : `<div class="thumb-ph">—</div>`}</td>
           <td><strong>${escapeHtml(s.name)}</strong></td>
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
-            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${escapeHtml(s.name).replace(/'/g, "\\'")}')">+ Article</button>
-            <button class="btn btn-outline btn-sm" onclick="editSub(${s.id})">Modifier</button>
+            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${escapeHtml(s.name).replace(/'/g, "\'")}')">+ Article</button>
+            <button class="btn btn-outline btn-sm" onclick="editSub(${s.id})">Modif.</button>
             <button class="btn btn-danger btn-sm" onclick="deleteSub(${s.id})">Suppr.</button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`).join('');
     }
 
     function resetSubUpload() {
@@ -804,6 +806,11 @@
         let logo = document.getElementById('subLogo').value || '';
         if (selectedSubFile) logo = await compressImage(selectedSubFile);
         const id = document.getElementById('subId').value;
+        if (!id && !logo) {
+          showStatus('Ajoute une image illustrative pour la sous-marque', 'err');
+          btn.disabled = false;
+          return;
+        }
         const payload = {
           name: document.getElementById('subName').value.trim(),
           description: document.getElementById('subDesc').value.trim(),
@@ -813,7 +820,7 @@
         if (id) ({ error } = await supabaseClient.from('sub_brands').update(payload).eq('id', id));
         else ({ error } = await supabaseClient.from('sub_brands').insert([payload]));
         if (error) throw error;
-        showStatus(id ? 'Modifiée' : 'Créée', 'ok');
+        showStatus(id ? 'Modifiée' : 'Créée — lie des articles via « + Article » ou lors de l’ajout d’article', 'ok');
         document.getElementById('subModal').classList.remove('open');
         await loadSubbrands();
         if (!id && confirm('Ajouter un article dans cette sous-marque ?')) {

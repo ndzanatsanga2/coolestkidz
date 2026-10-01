@@ -201,14 +201,16 @@
         sbGridEl.innerHTML = shown
           .map(function (s) {
             var logo = s.logo
-              ? '<img src="' + escapeHtml(s.logo) + '" alt="">'
-              : '<div class="ph">' + escapeHtml((s.name || "?")[0]) + "</div>";
+              ? '<div class="sb-card-img"><img src="' + escapeHtml(s.logo) + '" alt="' + escapeHtml(s.name) + '"></div>'
+              : '<div class="sb-card-img"><div class="ph">' + escapeHtml((s.name || "?")[0]) + "</div></div>";
             return (
               '<a class="sb-card" href="sous-marque.html?id=' + s.id + '">' +
               logo +
+              '<div class="sb-card-body">' +
               "<h3>" + escapeHtml(s.name) + "</h3>" +
               "<p>" + escapeHtml(s.description || "") + "</p>" +
-              "</a>"
+              '<span class="sb-card-cta">Voir les articles →</span>' +
+              "</div></a>"
             );
           })
           .join("");
@@ -237,6 +239,15 @@
         var descEl = document.getElementById("sbDesc");
         if (descEl) descEl.textContent = sb.description || "";
         document.title = sb.name + " — CoolestKidz";
+        var cover = document.getElementById("sbCover");
+        var hero = document.getElementById("sbHero");
+        if (cover && hero && sb.logo) {
+          cover.src = sb.logo;
+          cover.alt = sb.name || "";
+          hero.hidden = false;
+        } else if (hero) {
+          hero.hidden = true;
+        }
         var res2 = await client
           .from("products")
           .select("*")
