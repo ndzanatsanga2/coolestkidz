@@ -151,12 +151,17 @@
       }
       try {
         await loadSubBrandMap(client);
-        var res = await client.from("products").select("*").order("id", { ascending: false }).limit(8);
+        // À la une : uniquement les articles cochés « Mettre en avant »
+        var res = await client
+          .from("products")
+          .select("*")
+          .eq("featured", true)
+          .order("id", { ascending: false });
         if (res.error) throw res.error;
         var list = res.data || [];
         featured.innerHTML = list.length
           ? list.map(productCard).join("")
-          : '<div class="empty">Aucun article pour le moment.</div>';
+          : '<div class="empty">Aucun article mis en avant pour le moment.</div>';
       } catch (e) {
         console.error(e);
         featured.innerHTML = '<div class="empty">Impossible de charger.</div>';
