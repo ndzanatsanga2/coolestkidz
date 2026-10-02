@@ -697,10 +697,8 @@
       if (selected) sel.value = String(selected);
     }
 
-    function resetProductUpload() {
-      
     // ——— Product variants (multi photos + prix) ———
-    let productVariants = []; // { image, label, price, file? }
+    let productVariants = []; // { image, label, price }
 
     function renderVariants() {
       const box = document.getElementById('variantsList');
@@ -711,7 +709,7 @@
       }
       box.innerHTML = productVariants.map((v, i) => `
         <div class="variant-row" data-i="${i}">
-          ${v.image ? `<img src="${v.image}" alt="">` : `<div class="v-ph">Photo</div>`}
+          ${v.image ? `<img src="${escapeHtml(v.image)}" alt="">` : `<div class="v-ph">Photo</div>`}
           <div class="v-fields">
             <input type="text" placeholder="Libellé (ex: Noir, Vue dos…)" value="${escapeHtml(v.label || '')}" data-field="label" data-i="${i}">
             <input type="number" placeholder="Prix FCFA (optionnel)" min="0" step="500" value="${v.price != null && v.price !== '' ? v.price : ''}" data-field="price" data-i="${i}">
@@ -725,18 +723,21 @@
         inp.onchange = inp.oninput = () => {
           const i = +inp.dataset.i;
           const f = inp.dataset.field;
-          productVariants[i][f] = inp.value;
+          if (productVariants[i]) productVariants[i][f] = inp.value;
         };
       });
       box.querySelectorAll('[data-file]').forEach(inp => {
         inp.onchange = async () => {
           const i = +inp.dataset.file;
           const file = inp.files[0];
-          if (!file) return;
-          const url = await compressImage(file, 1000, 0.78);
-          productVariants[i].image = url;
-          productVariants[i].file = null;
-          renderVariants();
+          if (!file || !productVariants[i]) return;
+          if (file.size > 8 * 1024 * 1024) { alert('Max 8 Mo'); return; }
+          try {
+            productVariants[i].image = await compressImage(file, 1000, 0.78);
+            renderVariants();
+          } catch (err) {
+            showStatus(err.message || 'Erreur compression image', 'err');
+          }
         };
       });
       box.querySelectorAll('[data-del]').forEach(btn => {
@@ -747,38 +748,39 @@
       });
     }
 
+    function resetProductUpload() {
+      selectedFile = null;
+      const imageFile = document.getElementById('imageFile');
+      if (imageFile) imageFile.value = '';
+      const previewBox = document.getElementById('previewBox');
+      if (previewBox) previewBox.classList.remove('show');
+      const existing = document.getElementById('existingImage');
+      if (existing) existing.value = '';
+    }
+
+    function openProductModal(title, subId) {
+      document.getElementById('productModalTitle').textContent = title || 'Nouvel article';
+      document.getElementById('productForm').reset();
+      document.getElementById('productId').value = '';
+      resetProductUpload();
+      productVariants = [{ image: '', label: '', price: '' }];
+      renderVariants();
+      fillSubSelect(subId || '');
+      document.getElementById('productModal').classList.add('open');
+    }
+
     document.getElementById('addVariantBtn').onclick = () => {
       productVariants.push({ image: '', label: '', price: '' });
       renderVariants();
     };
 
-    selectedFile = null;
-      document.getElementById('imageFile').value = '';
-      document.getElementById('previewBox').classList.remove('show');
-      document.getElementById('uploadZone').style.display = 'block';
-      document.getElementById('existingImage').value = '';
-    }
+    document.getElementById('addProductBtn').onclick = () => openProductModal('Nouvel article');
 
-    document.getElementById('imageFile').onchange = () => {
-      const f = document.getElementById('imageFile').files[0];
-      if (!f) return;
-      if (f.size > 8 * 1024 * 1024) { alert('Max 8 Mo'); return; }
-      selectedFile = f;
-      document.getElementById('previewImg').src = URL.createObjectURL(f);
-      document.getElementById('previewBox').classList.add('show');
-      document.getElementById('uploadZone').style.display = 'none';
+    window.addProductToSub = function(subId, subName) {
+      openProductModal('Article — ' + (subName || ''), subId);
     };
-    document.getElementById('removeImg').onclick = resetProductUpload;
 
-    document.getElementById('addProductBtn').onclick = () => {
-      document.getElementById('productModalTitle').textContent = 'Nouvel article';
-      document.getElementById('productForm').reset();
-      document.getElementById('productId').value = '';
-      resetProductUpload();
-      fillSubSelect();
-      document.getElementById('productModal').classList.add('open');
-    };
-    document.getElementById('cancelProduct').onclick = () => document.getElementById('productModal').classList.remove('open');
+        document.getElementById('cancelProduct').onclick = () => document.getElementById('productModal').classList.remove('open');
     document.getElementById('productModal').onclick = e => {
       if (e.target.id === 'productModal') e.target.classList.remove('open');
     };
@@ -827,16 +829,7 @@
       else { showStatus('Article supprimé', 'ok'); loadProducts(); }
     };
 
-    window.addProductToSub = function(subId, subName) {
-      document.getElementById('productModalTitle').textContent = 'Article — ' + (subName || '');
-      document.getElementById('productForm').reset();
-      document.getElementById('productId').value = '';
-      resetProductUpload();
-      fillSubSelect(subId);
-      document.getElementById('productModal').classList.add('open');
-    };
-
-    document.getElementById('productForm').onsubmit = async e => {
+        document.getElementById('productForm').onsubmit = async e => {
       e.preventDefault();
       const btn = document.getElementById('saveProduct');
       btn.disabled = true;
@@ -872,6 +865,12 @@
         let error;
         if (id) ({ error } = await supabaseClient.from('products').update(payload).eq('id', id));
         else ({ error } = await supabaseClient.from('products').insert([payload]));
+        // Si la colonne gallery n'existe pas encore → retry sans gallery
+        if (error && /gallery|column|schema/i.test(error.message || '')) {
+          const { gallery: _g, ...payloadNoGal } = payload;
+          if (id) ({ error } = await supabaseClient.from('products').update(payloadNoGal).eq('id', id));
+          else ({ error } = await supabaseClient.from('products').insert([payloadNoGal]));
+        }
         if (error) throw error;
         showStatus(id ? 'Article modifié' : 'Article ajouté', 'ok');
         document.getElementById('productModal').classList.remove('open');
