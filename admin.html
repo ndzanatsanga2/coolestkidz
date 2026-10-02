@@ -574,6 +574,15 @@
           <textarea id="subDesc"></textarea>
         </div>
         <div class="field">
+          <label>Collection cible *</label>
+          <p style="font-size:0.75rem;color:var(--muted);margin:-4px 0 8px">Cette sous-marque s’affiche pour Homme, Femme, ou les deux.</p>
+          <select id="subCategory" required>
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+            <option value="Unisexe" selected>Mixte (Homme &amp; Femme)</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Image illustrative *</label>
           <p style="font-size:0.78rem;color:var(--muted);margin:-6px 0 10px">Affichée sur la carte et en bannière de la sous-marque. Les articles liés s’affichent en dessous.</p>
           <div class="upload" id="subUploadZone">
@@ -1003,6 +1012,7 @@
           <td>
             <strong>${escapeHtml(s.name)}</strong>
             <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">${n} article${n!==1?'s':''}</div>
+            <div style="margin-top:6px"><span class="badge">${escapeHtml(s.category === 'Unisexe' || !s.category ? 'Mixte' : s.category)}</span></div>
           </td>
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
@@ -1035,6 +1045,7 @@
       document.getElementById('subModalTitle').textContent = 'Nouvelle sous-marque';
       document.getElementById('subForm').reset();
       document.getElementById('subId').value = '';
+      document.getElementById('subCategory').value = 'Unisexe';
       resetSubUpload();
       document.getElementById('subModal').classList.add('open');
     };
@@ -1050,6 +1061,7 @@
       document.getElementById('subId').value = data.id;
       document.getElementById('subName').value = data.name;
       document.getElementById('subDesc').value = data.description || '';
+      document.getElementById('subCategory').value = data.category || 'Unisexe';
       document.getElementById('subLogo').value = data.logo || '';
       selectedSubFile = null;
       document.getElementById('subLogoFile').value = '';
@@ -1084,11 +1096,18 @@
         const payload = {
           name: document.getElementById('subName').value.trim(),
           description: document.getElementById('subDesc').value.trim(),
+          category: document.getElementById('subCategory').value || 'Unisexe',
           logo
         };
         let error;
         if (id) ({ error } = await supabaseClient.from('sub_brands').update(payload).eq('id', id));
         else ({ error } = await supabaseClient.from('sub_brands').insert([payload]));
+        // Colonne category absente → retry sans
+        if (error && /category|column|schema/i.test(error.message || '')) {
+          const { category: _c, ...payloadNoCat } = payload;
+          if (id) ({ error } = await supabaseClient.from('sub_brands').update(payloadNoCat).eq('id', id));
+          else ({ error } = await supabaseClient.from('sub_brands').insert([payloadNoCat]));
+        }
         if (error) throw error;
         showStatus(id ? 'Modifiée' : 'Créée — lie des articles via « + Article » ou lors de l’ajout d’article', 'ok');
         document.getElementById('subModal').classList.remove('open');

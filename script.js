@@ -90,15 +90,28 @@
   async function loadSubBrandMap(client) {
     if (!client) return;
     try {
-      var res = await client.from("sub_brands").select("id,name");
+      var res = await client.from("sub_brands").select("id,name,category");
       if (res.error || !res.data) return;
       subBrandMap = {};
+      window.__subBrandMeta = {};
       res.data.forEach(function (s) {
         subBrandMap[s.id] = s.name;
+        window.__subBrandMeta[s.id] = s;
       });
     } catch (e) {
       console.error(e);
     }
+  }
+
+  function subBrandMatchesShop(subId, shopCat) {
+    if (!subId || !window.__subBrandMeta) return true;
+    var meta = window.__subBrandMeta[subId];
+    if (!meta || !meta.category) return true;
+    var c = String(meta.category).toLowerCase();
+    if (c === "unisexe" || c === "mixte" || c === "both") return true;
+    if (shopCat === "Homme") return c.indexOf("homme") !== -1 || c.indexOf("men") !== -1;
+    if (shopCat === "Femme") return c.indexOf("femme") !== -1 || c.indexOf("women") !== -1;
+    return true;
   }
 
   function productCard(p) {
@@ -164,9 +177,11 @@
         await loadSubBrandMap(client);
         var res = await client.from("products").select("*").order("id", { ascending: false });
         if (res.error) throw res.error;
-        // Vue globale Homme/Femme : marque principale + sous-marques
+        // Vue globale Homme/Femme : principale + sous-marques ciblées
         var list = (res.data || []).filter(function (p) {
-          return matchesShopCategory(p.category, cat);
+          if (!matchesShopCategory(p.category, cat)) return false;
+          if (p.sub_brand_id && !subBrandMatchesShop(p.sub_brand_id, cat)) return false;
+          return true;
         });
         grid.innerHTML = list.length
           ? list.map(productCard).join("")
