@@ -85,18 +85,43 @@
     });
   }
 
+  var subBrandMap = {};
+
+  async function loadSubBrandMap(client) {
+    if (!client) return;
+    try {
+      var res = await client.from("sub_brands").select("id,name");
+      if (res.error || !res.data) return;
+      subBrandMap = {};
+      res.data.forEach(function (s) {
+        subBrandMap[s.id] = s.name;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   function productCard(p) {
     var cat = displayCategory(p.category);
     var img = p.image
       ? '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
       : '<div class="ph">' + escapeHtml(p.name) + "</div>";
     var badge = p.featured ? '<span class="product-badge">Nouveau</span>' : "";
+    var subName = p.sub_brand_id ? subBrandMap[p.sub_brand_id] : null;
+    // Sous-marque : lien vers la page de la ligne ; sinon fiche article
+    var href = p.sub_brand_id
+      ? "sous-marque.html?id=" + p.sub_brand_id
+      : "produit.html?id=" + p.id;
+    var titleHtml = subName
+      ? '<div class="product-sub">' + escapeHtml(subName) + "</div>" +
+        "<h3>" + escapeHtml(p.name) + "</h3>"
+      : "<h3>" + escapeHtml(p.name) + "</h3>";
     return (
-      '<a class="product-card" href="produit.html?id=' + p.id + '">' +
+      '<a class="product-card" href="' + href + '">' +
       '<div class="product-img">' + img + badge + "</div>" +
       '<div class="product-info">' +
       '<div class="cat">' + escapeHtml(cat) + "</div>" +
-      "<h3>" + escapeHtml(p.name) + "</h3>" +
+      titleHtml +
       '<div class="price">' + formatPrice(p.price) + "</div>" +
       "</div></a>"
     );
@@ -111,6 +136,7 @@
         return;
       }
       try {
+        await loadSubBrandMap(client);
         var res = await client.from("products").select("*").order("id", { ascending: false }).limit(8);
         if (res.error) throw res.error;
         var list = res.data || [];
@@ -134,6 +160,7 @@
         return;
       }
       try {
+        await loadSubBrandMap(client);
         var res = await client.from("products").select("*").order("id", { ascending: false });
         if (res.error) throw res.error;
         // Vue globale Homme/Femme : marque principale + sous-marques
@@ -365,8 +392,15 @@
         }
         if (pgrid) {
           pgrid.innerHTML = list.length
-            ? list.map(productCard).join("")
-            : '<div class="empty">Aucun article lié à cette sous-marque pour le moment.<br><small>Dans l’admin → Sous-marques → « + Article » sur cette ligne, ou choisis la sous-marque à la création de l’article.</small></div>';
+            ? list.map(function (p) {
+                // Sur la page sous-marque : ouvrir la fiche article
+                var card = productCard(p);
+                return card.replace(
+                  /href="sous-marque\.html\?id=\d+"/,
+                  'href="produit.html?id=' + p.id + '"'
+                );
+              }).join("")
+            : '<div class="empty">Aucun article lié à cette sous-marque pour le moment.<br><small>Dans l’admin → Sous-marques → Ouvrir → « + Article ».</small></div>';
         }
       } catch (e) {
         console.error(e);

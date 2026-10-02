@@ -1373,3 +1373,12 @@ button, input, select, textarea { font-family: inherit; }
   margin-bottom: 8px;
   transition: opacity 0.2s;
 }
+
+.product-sub {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 4px;
+}
