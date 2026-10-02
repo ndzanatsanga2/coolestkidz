@@ -160,8 +160,20 @@
           </div>
           <p class="video-caption">Drop tee noir</p>
         </article>
+        <article class="video-card">
+          <div class="video-frame">
+            <video class="brand-video" muted loop playsinline autoplay preload="metadata" poster="media/campagne-3-poster.jpg">
+              <source src="media/campagne-3.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="video-caption">Pink session</p>
+        </article>
       </div>
-      <p class="video-hint">← Faites défiler →</p>
+      <p class="video-hint">← Faites défiler · Cliquez pour agrandir →</p>
+      <div class="video-lightbox" id="videoLightbox" hidden>
+        <button type="button" class="video-lightbox-close" id="videoLightboxClose" aria-label="Fermer">×</button>
+        <video id="videoLightboxPlayer" controls playsinline></video>
+      </div>
     </div>
   </section>
 
