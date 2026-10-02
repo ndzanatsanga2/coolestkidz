@@ -1007,7 +1007,6 @@
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
             <button class="btn btn-sm" onclick="event.stopPropagation(); openSubDetail(${s.id})">Ouvrir</button>
-            <button class="btn btn-sm" onclick="event.stopPropagation(); addProductToSub(${s.id}, '${safeName}')">+ Article</button>
             <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editSub(${s.id})">Modif.</button>
             <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteSub(${s.id})">Suppr.</button>
           </td>
@@ -1096,7 +1095,7 @@
         await loadSubbrands();
         if (!id && confirm('Ajouter un article dans cette sous-marque ?')) {
           const last = subBrandsCache[subBrandsCache.length - 1];
-          if (last) addProductToSub(last.id, last.name);
+          if (last) openSubDetail(last.id);
         }
       } catch (err) {
         showStatus(err.message || 'Erreur', 'err');
