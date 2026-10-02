@@ -113,7 +113,7 @@
       try {
         var res = await client.from("products").select("*").order("id", { ascending: false }).limit(8);
         if (res.error) throw res.error;
-        var list = res.data || [];
+        var list = (res.data || []).filter(function (p) { return !p.sub_brand_id; });
         featured.innerHTML = list.length
           ? list.map(productCard).join("")
           : '<div class="empty">Aucun article pour le moment.</div>';
@@ -137,7 +137,7 @@
         var res = await client.from("products").select("*").order("id", { ascending: false });
         if (res.error) throw res.error;
         var list = (res.data || []).filter(function (p) {
-          return matchesShopCategory(p.category, cat);
+          return !p.sub_brand_id && matchesShopCategory(p.category, cat);
         });
         grid.innerHTML = list.length
           ? list.map(productCard).join("")

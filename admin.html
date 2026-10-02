@@ -394,7 +394,7 @@
       <!-- Products panel -->
       <div class="panel active" id="panel-products">
         <div class="toolbar">
-          <h2>Articles <span id="productCount"></span></h2>
+          <h2>Articles — marque principale <span id="productCount"></span></h2>
           <button class="btn" id="addProductBtn">+ Article</button>
         </div>
         <div class="table-wrap" id="productTableWrap">
@@ -412,7 +412,7 @@
             <tbody id="productsBody"></tbody>
           </table>
         </div>
-        <div class="empty" id="productEmpty" style="display:none">Aucun article.</div>
+        <div class="empty" id="productEmpty" style="display:none">Aucun article de la marque principale. Les articles des sous-marques se gèrent dans l’onglet Sous-marques.</div>
       </div>
 
       <!-- Sub-brands panel -->
@@ -435,6 +435,32 @@
           </table>
         </div>
         <div class="empty" id="subEmpty" style="display:none">Aucune sous-marque.</div>
+
+        <div id="subDetail" style="display:none;margin-top:28px;border-top:1px solid var(--line);padding-top:24px">
+          <div class="toolbar" style="margin-bottom:12px">
+            <h2 id="subDetailTitle">Sous-marque</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn" id="subDetailAddBtn">+ Article</button>
+              <button type="button" class="btn btn-outline" id="subDetailBackBtn">← Liste sous-marques</button>
+            </div>
+          </div>
+          <p id="subDetailHint" style="font-size:0.85rem;color:var(--muted);margin-bottom:16px"></p>
+          <div class="table-wrap" id="subDetailTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Nom</th>
+                  <th>Catégorie</th>
+                  <th>Prix</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="subDetailBody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="subDetailEmpty" style="display:none">Aucun article dans cette sous-marque. Clique sur « + Article ».</div>
+        </div>
       </div>
 
       <!-- Vitrine images panel -->
@@ -662,7 +688,8 @@
     async function loadProducts() {
       const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
       if (error) { showStatus(error.message, 'err'); return; }
-      const list = data || [];
+      // Marque principale uniquement (pas les sous-marques)
+      const list = (data || []).filter(p => !p.sub_brand_id);
       document.getElementById('productCount').textContent = '(' + list.length + ')';
       const wrap = document.getElementById('productTableWrap');
       const empty = document.getElementById('productEmpty');
@@ -673,15 +700,69 @@
       }
       wrap.style.display = 'block';
       empty.style.display = 'none';
-      const subMap = Object.fromEntries(subBrandsCache.map(s => [s.id, s.name]));
       document.getElementById('productsBody').innerHTML = list.map(p => {
         const img = p.image ? `<img class="thumb" src="${escapeHtml(p.image)}">` : `<div class="thumb-ph">—</div>`;
-        const sub = p.sub_brand_id ? (subMap[p.sub_brand_id] || '—') : 'Principale';
         return `<tr>
           <td>${img}</td>
           <td><strong>${escapeHtml(p.name)}</strong></td>
           <td><span class="badge">${escapeHtml(p.category || '')}</span></td>
-          <td>${escapeHtml(sub)}</td>
+          <td>Principale</td>
+          <td>${formatPrice(p.price)}</td>
+          <td class="actions">
+            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    let currentSubDetailId = null;
+
+    async function openSubDetail(subId) {
+      currentSubDetailId = Number(subId);
+      const sub = subBrandsCache.find(s => s.id === currentSubDetailId);
+      if (!sub) return;
+      document.getElementById('subTableWrap').style.display = 'none';
+      document.getElementById('subEmpty').style.display = 'none';
+      document.getElementById('subDetail').style.display = 'block';
+      document.getElementById('subDetailTitle').textContent = sub.name;
+      document.getElementById('subDetailHint').textContent =
+        'Articles de cette sous-marque uniquement. Ils n’apparaissent pas dans « Articles — marque principale ».';
+      document.getElementById('subDetailAddBtn').onclick = () =>
+        openProductModal('Article — ' + sub.name, currentSubDetailId);
+      await loadSubDetailProducts();
+    }
+
+    function closeSubDetail() {
+      currentSubDetailId = null;
+      document.getElementById('subDetail').style.display = 'none';
+      loadSubbrands();
+    }
+
+    async function loadSubDetailProducts() {
+      if (!currentSubDetailId) return;
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('*')
+        .eq('sub_brand_id', currentSubDetailId)
+        .order('id', { ascending: false });
+      if (error) { showStatus(error.message, 'err'); return; }
+      const list = data || [];
+      const wrap = document.getElementById('subDetailTableWrap');
+      const empty = document.getElementById('subDetailEmpty');
+      if (!list.length) {
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      wrap.style.display = 'block';
+      empty.style.display = 'none';
+      document.getElementById('subDetailBody').innerHTML = list.map(p => {
+        const img = p.image ? `<img class="thumb" src="${escapeHtml(p.image)}">` : `<div class="thumb-ph">—</div>`;
+        return `<tr>
+          <td>${img}</td>
+          <td><strong>${escapeHtml(p.name)}</strong></td>
+          <td><span class="badge">${escapeHtml(p.category || '')}</span></td>
           <td>${formatPrice(p.price)}</td>
           <td class="actions">
             <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
@@ -770,6 +851,9 @@
       document.getElementById('productModal').classList.add('open');
     }
 
+    
+    document.getElementById('subDetailBackBtn').onclick = closeSubDetail;
+
     document.getElementById('addVariantBtn').onclick = () => {
       productVariants.push({ image: '', label: '', price: '' });
       renderVariants();
@@ -827,7 +911,7 @@
       if (!confirm('Supprimer cet article ?')) return;
       const { error } = await supabaseClient.from('products').delete().eq('id', id);
       if (error) showStatus(error.message, 'err');
-      else { showStatus('Article supprimé', 'ok'); loadProducts(); }
+      else { showStatus('Article supprimé', 'ok'); loadProducts(); if (currentSubDetailId) loadSubDetailProducts(); loadSubbrands(); }
     };
 
         document.getElementById('productForm').onsubmit = async e => {
@@ -877,6 +961,7 @@
         document.getElementById('productModal').classList.remove('open');
         loadProducts();
         loadSubbrands();
+        if (currentSubDetailId) loadSubDetailProducts();
       } catch (err) {
         showStatus(err.message || 'Erreur', 'err');
       } finally {
@@ -913,7 +998,7 @@
         const n = counts[s.id] || 0;
         const safeName = escapeHtml(s.name).replace(/'/g, "\\'");
         return `
-        <tr>
+        <tr style="cursor:pointer" onclick="if(!event.target.closest('button,a')) openSubDetail(${s.id})">
           <td>${s.logo ? `<img class="thumb" src="${escapeHtml(s.logo)}" alt="">` : `<div class="thumb-ph">—</div>`}</td>
           <td>
             <strong>${escapeHtml(s.name)}</strong>
@@ -921,10 +1006,10 @@
           </td>
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
-            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${safeName}')">+ Article</button>
-            <a class="btn btn-outline btn-sm" href="sous-marque.html?id=${s.id}" target="_blank">Voir</a>
-            <button class="btn btn-outline btn-sm" onclick="editSub(${s.id})">Modif.</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteSub(${s.id})">Suppr.</button>
+            <button class="btn btn-sm" onclick="event.stopPropagation(); openSubDetail(${s.id})">Ouvrir</button>
+            <button class="btn btn-sm" onclick="event.stopPropagation(); addProductToSub(${s.id}, '${safeName}')">+ Article</button>
+            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editSub(${s.id})">Modif.</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteSub(${s.id})">Suppr.</button>
           </td>
         </tr>`;
       }).join('');
