@@ -1418,3 +1418,28 @@ button, input, select, textarea { font-family: inherit; }
   border-radius: 50%;
 }
 .video-lightbox-close:hover { background: rgba(255,255,255,0.22); }
+
+.pdp-wa-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 10px;
+}
+.pdp-wa-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.pdp-wa-btn {
+  text-align: center;
+  width: 100%;
+}
+@media (min-width: 480px) {
+  .pdp-wa-row {
+    flex-direction: row;
+  }
+  .pdp-wa-btn { flex: 1; }
+}

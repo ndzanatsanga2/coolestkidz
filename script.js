@@ -272,7 +272,11 @@
           escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") +
           "</p>" +
           '<div class="pdp-actions">' +
-          '<a class="btn btn-red" id="pdpWa" href="#" target="_blank" rel="noopener">Commander WhatsApp</a>' +
+          '<p class="pdp-wa-label">Commander via WhatsApp — choisissez un numéro</p>' +
+          '<div class="pdp-wa-row" id="pdpWaRow">' +
+          '<a class="btn btn-red pdp-wa-btn" id="pdpWa1" href="#" target="_blank" rel="noopener">+237 690 100 325</a>' +
+          '<a class="btn btn-red pdp-wa-btn" id="pdpWa2" href="#" target="_blank" rel="noopener">+237 695 149 577</a>' +
+          "</div>" +
           '<a class="btn btn-outline-dark" href="' +
           (cat === "Femme" ? "femme.html" : "homme.html") +
           '">Retour</a>' +
@@ -281,21 +285,21 @@
         function updatePdpVariant(price, label) {
           var priceEl = document.getElementById("pdpPrice");
           var labEl = document.getElementById("pdpVariantLabel");
-          var wa = document.getElementById("pdpWa");
           if (priceEl) priceEl.textContent = formatPrice(price);
           if (labEl) labEl.textContent = label || "";
-          if (wa) {
-            var msg =
-              "Bonjour CoolestKidz 👋\n\nJe suis intéressé(e) par cet article :\n" +
-              data.name +
-              (label ? "\nVariante : " + label : "") +
-              "\nPrix : " +
-              formatPrice(price) +
-              "\n\nLien de l'article :\n" +
-              (location.origin + "/produit.html?id=" + data.id);
-            wa.href =
-              "https://wa.me/237690100325?text=" + encodeURIComponent(msg);
-          }
+          var msg =
+            "Bonjour CoolestKidz 👋\n\nJe suis intéressé(e) par cet article :\n" +
+            data.name +
+            (label ? "\nVariante : " + label : "") +
+            "\nPrix : " +
+            formatPrice(price) +
+            "\n\nLien de l'article :\n" +
+            (location.origin + "/produit.html?id=" + data.id);
+          var q = encodeURIComponent(msg);
+          var wa1 = document.getElementById("pdpWa1");
+          var wa2 = document.getElementById("pdpWa2");
+          if (wa1) wa1.href = "https://wa.me/237690100325?text=" + q;
+          if (wa2) wa2.href = "https://wa.me/237695149577?text=" + q;
         }
         updatePdpVariant(firstPrice, firstLabel);
 
