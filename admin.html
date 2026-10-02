@@ -233,37 +233,6 @@
     .field textarea { min-height: 90px; resize: vertical; }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 480px) { .row-2 { grid-template-columns: 1fr; } }
-
-    /* Mobile admin — suppression & actions */
-    @media (max-width: 720px) {
-      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -12px; padding: 0 12px; }
-      table { min-width: 0; width: 100%; }
-      th, td { padding: 12px 8px; font-size: 0.85rem; }
-      .thumb, .thumb-ph { width: 48px; height: 60px; }
-      .actions {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        min-width: 110px;
-      }
-      .actions .btn,
-      .actions .btn-sm {
-        width: 100%;
-        min-height: 44px;
-        padding: 12px 14px;
-        font-size: 0.78rem;
-        touch-action: manipulation;
-      }
-      .btn, .btn-sm {
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .tabs { gap: 4px; }
-      .tab { padding: 12px 10px; font-size: 0.72rem; }
-      .toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
-      .toolbar .btn { width: 100%; min-height: 48px; }
-    }
-
     .check { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
     .check input { width: auto; }
     .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
@@ -740,8 +709,8 @@
           <td>Principale</td>
           <td>${formatPrice(p.price)}</td>
           <td class="actions">
-            <button class="btn btn-outline btn-sm" type="button" onclick="editProduct(${p.id})">Modifier</button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id}, event)">Suppr.</button>
+            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
           </td>
         </tr>`;
       }).join('');
@@ -796,8 +765,8 @@
           <td><span class="badge">${escapeHtml(p.category || '')}</span></td>
           <td>${formatPrice(p.price)}</td>
           <td class="actions">
-            <button class="btn btn-outline btn-sm" type="button" onclick="editProduct(${p.id})">Modifier</button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id}, event)">Suppr.</button>
+            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
           </td>
         </tr>`;
       }).join('');
@@ -938,23 +907,11 @@
       document.getElementById('productModal').classList.add('open');
     };
 
-    window.deleteProduct = async function(id, ev) {
-      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      if (window.__ckDeleting) return;
-      if (!window.confirm('Supprimer cet article ?')) return;
-      window.__ckDeleting = true;
-      try {
-        const { error } = await supabaseClient.from('products').delete().eq('id', id);
-        if (error) showStatus(error.message, 'err');
-        else {
-          showStatus('Article supprimé', 'ok');
-          await loadProducts();
-          if (currentSubDetailId) await loadSubDetailProducts();
-          await loadSubbrands();
-        }
-      } finally {
-        window.__ckDeleting = false;
-      }
+    window.deleteProduct = async function(id) {
+      if (!confirm('Supprimer cet article ?')) return;
+      const { error } = await supabaseClient.from('products').delete().eq('id', id);
+      if (error) showStatus(error.message, 'err');
+      else { showStatus('Article supprimé', 'ok'); loadProducts(); if (currentSubDetailId) loadSubDetailProducts(); loadSubbrands(); }
     };
 
         document.getElementById('productForm').onsubmit = async e => {
@@ -1041,7 +998,7 @@
         const n = counts[s.id] || 0;
         const safeName = escapeHtml(s.name).replace(/'/g, "\\'");
         return `
-        <tr>
+        <tr style="cursor:pointer" onclick="if(!event.target.closest('button,a')) openSubDetail(${s.id})">
           <td>${s.logo ? `<img class="thumb" src="${escapeHtml(s.logo)}" alt="">` : `<div class="thumb-ph">—</div>`}</td>
           <td>
             <strong>${escapeHtml(s.name)}</strong>
@@ -1049,9 +1006,9 @@
           </td>
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
-            <button class="btn btn-sm" type="button" onclick="openSubDetail(${s.id})">Ouvrir</button>
-            <button class="btn btn-outline btn-sm" type="button" onclick="editSub(${s.id})">Modif.</button>
-            <button class="btn btn-danger btn-sm" type="button" onclick="deleteSub(${s.id}, event)">Suppr.</button>
+            <button class="btn btn-sm" onclick="event.stopPropagation(); openSubDetail(${s.id})">Ouvrir</button>
+            <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); editSub(${s.id})">Modif.</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteSub(${s.id})">Suppr.</button>
           </td>
         </tr>`;
       }).join('');
@@ -1104,25 +1061,11 @@
       document.getElementById('subModal').classList.add('open');
     };
 
-    window.deleteSub = async function(id, ev) {
-      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      if (window.__ckDeleting) return;
-      if (!window.confirm('Supprimer cette sous-marque et détacher ses articles ?')) return;
-      window.__ckDeleting = true;
-      try {
-        // Détacher les articles liés puis supprimer la sous-marque
-        await supabaseClient.from('products').update({ sub_brand_id: null }).eq('sub_brand_id', id);
-        const { error } = await supabaseClient.from('sub_brands').delete().eq('id', id);
-        if (error) showStatus(error.message, 'err');
-        else {
-          showStatus('Sous-marque supprimée', 'ok');
-          if (currentSubDetailId === Number(id)) closeSubDetail();
-          await loadSubbrands();
-          await loadProducts();
-        }
-      } finally {
-        window.__ckDeleting = false;
-      }
+    window.deleteSub = async function(id) {
+      if (!confirm('Supprimer cette sous-marque ?')) return;
+      const { error } = await supabaseClient.from('sub_brands').delete().eq('id', id);
+      if (error) showStatus(error.message, 'err');
+      else { showStatus('Sous-marque supprimée', 'ok'); loadSubbrands(); loadProducts(); }
     };
 
     document.getElementById('subForm').onsubmit = async e => {
