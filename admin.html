@@ -501,6 +501,7 @@
         </div>
         <div class="field">
           <label>Sous-marque</label>
+          <p style="font-size:0.75rem;color:var(--muted);margin:-4px 0 8px">Si tu choisis une sous-marque, l’article apparaîtra sur sa page (clic sur la sous-marque côté site).</p>
           <select id="productSubBrand">
             <option value="">CoolestKidz (principale)</option>
           </select>
@@ -872,9 +873,10 @@
           else ({ error } = await supabaseClient.from('products').insert([payloadNoGal]));
         }
         if (error) throw error;
-        showStatus(id ? 'Article modifié' : 'Article ajouté', 'ok');
+        showStatus(id ? 'Article modifié' : 'Article ajouté — visible sur la sous-marque si liée', 'ok');
         document.getElementById('productModal').classList.remove('open');
         loadProducts();
+        loadSubbrands();
       } catch (err) {
         showStatus(err.message || 'Erreur', 'err');
       } finally {
@@ -888,6 +890,14 @@
       const { data, error } = await supabaseClient.from('sub_brands').select('*').order('id');
       if (error) { console.error(error); return; }
       subBrandsCache = data || [];
+      // Compter les articles par sous-marque
+      let counts = {};
+      try {
+        const pr = await supabaseClient.from('products').select('id,sub_brand_id');
+        (pr.data || []).forEach(p => {
+          if (p.sub_brand_id) counts[p.sub_brand_id] = (counts[p.sub_brand_id] || 0) + 1;
+        });
+      } catch (e) {}
       fillSubSelect();
       document.getElementById('subCount').textContent = '(' + subBrandsCache.length + ')';
       const wrap = document.getElementById('subTableWrap');
@@ -899,17 +909,25 @@
       }
       wrap.style.display = 'block';
       empty.style.display = 'none';
-      document.getElementById('subBody').innerHTML = subBrandsCache.map(s => `
+      document.getElementById('subBody').innerHTML = subBrandsCache.map(s => {
+        const n = counts[s.id] || 0;
+        const safeName = escapeHtml(s.name).replace(/'/g, "\\'");
+        return `
         <tr>
           <td>${s.logo ? `<img class="thumb" src="${escapeHtml(s.logo)}" alt="">` : `<div class="thumb-ph">—</div>`}</td>
-          <td><strong>${escapeHtml(s.name)}</strong></td>
+          <td>
+            <strong>${escapeHtml(s.name)}</strong>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">${n} article${n!==1?'s':''}</div>
+          </td>
           <td>${escapeHtml((s.description || '').slice(0, 70))}</td>
           <td class="actions">
-            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${escapeHtml(s.name).replace(/'/g, "\'")}')">+ Article</button>
+            <button class="btn btn-sm" onclick="addProductToSub(${s.id}, '${safeName}')">+ Article</button>
+            <a class="btn btn-outline btn-sm" href="sous-marque.html?id=${s.id}" target="_blank">Voir</a>
             <button class="btn btn-outline btn-sm" onclick="editSub(${s.id})">Modif.</button>
             <button class="btn btn-danger btn-sm" onclick="deleteSub(${s.id})">Suppr.</button>
           </td>
-        </tr>`).join('');
+        </tr>`;
+      }).join('');
     }
 
     function resetSubUpload() {

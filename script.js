@@ -331,12 +331,13 @@
 
   var sbTitle = document.getElementById("sbTitle");
   if (sbTitle) {
-    var sbId = qs("id");
+    var sbIdRaw = qs("id");
+    var sbId = sbIdRaw ? Number(sbIdRaw) : NaN;
     var pgrid = document.getElementById("productsGrid");
     (async function () {
       var client = getClient();
-      if (!client || !sbId) {
-        if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
+      if (!client || !sbIdRaw || isNaN(sbId)) {
+        if (pgrid) pgrid.innerHTML = '<div class="empty">Sous-marque introuvable.</div>';
         return;
       }
       try {
@@ -352,15 +353,23 @@
           .select("*")
           .eq("sub_brand_id", sbId)
           .order("id", { ascending: false });
+        if (res2.error) throw res2.error;
         var list = res2.data || [];
+        var titleEl = document.querySelector(".sb-products-title");
+        if (titleEl) {
+          titleEl.textContent =
+            list.length
+              ? "Articles de cette ligne (" + list.length + ")"
+              : "Articles de cette ligne";
+        }
         if (pgrid) {
           pgrid.innerHTML = list.length
             ? list.map(productCard).join("")
-            : '<div class="empty">Aucun article dans cette ligne.</div>';
+            : '<div class="empty">Aucun article lié à cette sous-marque pour le moment.<br><small>Dans l’admin → Sous-marques → « + Article » sur cette ligne, ou choisis la sous-marque à la création de l’article.</small></div>';
         }
       } catch (e) {
         console.error(e);
-        if (pgrid) pgrid.innerHTML = '<div class="empty">Introuvable.</div>';
+        if (pgrid) pgrid.innerHTML = '<div class="empty">Impossible de charger cette sous-marque.</div>';
       }
     })();
   }
