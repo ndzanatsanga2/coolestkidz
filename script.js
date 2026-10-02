@@ -107,15 +107,16 @@
       ? '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
       : '<div class="ph">' + escapeHtml(p.name) + "</div>";
     var badge = p.featured ? '<span class="product-badge">Nouveau</span>' : "";
-    var subName = p.sub_brand_id ? subBrandMap[p.sub_brand_id] : null;
+    var brandLabel = p.sub_brand_id
+      ? (subBrandMap[p.sub_brand_id] || "Sous-marque")
+      : "CoolestKidz";
     // Sous-marque : lien vers la page de la ligne ; sinon fiche article
     var href = p.sub_brand_id
       ? "sous-marque.html?id=" + p.sub_brand_id
       : "produit.html?id=" + p.id;
-    var titleHtml = subName
-      ? '<div class="product-sub">' + escapeHtml(subName) + "</div>" +
-        "<h3>" + escapeHtml(p.name) + "</h3>"
-      : "<h3>" + escapeHtml(p.name) + "</h3>";
+    var titleHtml =
+      '<div class="product-sub">' + escapeHtml(brandLabel) + "</div>" +
+      "<h3>" + escapeHtml(p.name) + "</h3>";
     return (
       '<a class="product-card" href="' + href + '">' +
       '<div class="product-img">' + img + badge + "</div>" +
