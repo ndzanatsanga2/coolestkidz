@@ -480,13 +480,20 @@
     }
   })();
 
-  // Brand videos: autoplay loop (muted) + clic = agrandir avec son
+  // Brand videos: boucle muette sans contrôles / sans pause
   document.querySelectorAll(".brand-video").forEach(function (v) {
     v.muted = true;
+    v.loop = true;
+    v.controls = false;
+    v.setAttribute("playsinline", "");
     var tryPlay = function () {
       v.play().catch(function () {});
     };
     v.addEventListener("loadeddata", tryPlay);
+    v.addEventListener("pause", function () {
+      // Empêche l'arrêt : reprend immédiatement
+      if (!v.dataset.allowPause) tryPlay();
+    });
     tryPlay();
     v.addEventListener("click", function (e) {
       e.preventDefault();
@@ -501,6 +508,7 @@
       player.src = src;
       player.muted = false;
       player.loop = true;
+      player.controls = true;
       player.currentTime = 0;
       lb.hidden = false;
       document.body.style.overflow = "hidden";

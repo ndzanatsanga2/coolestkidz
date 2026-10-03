@@ -1514,3 +1514,8 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 }
+
+/* Pas de barre de contrôles sur les pubs en carrousel */
+.pub-item video::-webkit-media-controls { display: none !important; }
+.pub-item video::-webkit-media-controls-enclosure { display: none !important; }
+.pub-item video { pointer-events: auto; }
