@@ -87,6 +87,47 @@
 
     .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
 
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .dash-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 20px 16px;
+    }
+    .dash-card .n {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .dash-card .l {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .dash-card.accent .n { color: var(--red); }
+    .dash-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    .sort-btns { display: flex; flex-direction: column; gap: 2px; }
+    .sort-btns button {
+      background: var(--warm);
+      border: 1px solid var(--line);
+      width: 28px;
+      height: 22px;
+      cursor: pointer;
+      font-size: 0.65rem;
+      line-height: 1;
+      font-family: inherit;
+    }
+    .sort-btns button:hover { background: var(--line); }
+
+
     .tabs {
       display: flex;
       gap: 0;
@@ -386,25 +427,52 @@
       <div id="statusMsg" class="msg"></div>
 
       <div class="tabs">
-        <button class="tab active" data-tab="products">Articles</button>
+        <button class="tab active" data-tab="dash">Tableau de bord</button>
+        <button class="tab" data-tab="products">Articles</button>
         <button class="tab" data-tab="subs">Sous-marques</button>
         <button class="tab" data-tab="vitrine">Images vitrine</button>
+        <button class="tab" data-tab="settings">Réglages</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div class="panel active" id="panel-dash">
+        <div class="toolbar">
+          <h2>Tableau de bord</h2>
+        </div>
+        <div class="dash-grid" id="dashGrid">
+          <div class="dash-card"><div class="n" id="dTotal">—</div><div class="l">Articles total</div></div>
+          <div class="dash-card"><div class="n" id="dMain">—</div><div class="l">Marque principale</div></div>
+          <div class="dash-card"><div class="n" id="dSub">—</div><div class="l">Sous-marques (art.)</div></div>
+          <div class="dash-card accent"><div class="n" id="dFeat">—</div><div class="l">À la une</div></div>
+          <div class="dash-card"><div class="n" id="dBrands">—</div><div class="l">Sous-marques</div></div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px">Accès rapides</p>
+        <div class="dash-actions">
+          <button type="button" class="btn" onclick="document.querySelector('[data-tab=products]').click()">Gérer articles</button>
+          <button type="button" class="btn btn-outline" onclick="document.querySelector('[data-tab=subs]').click()">Sous-marques</button>
+          <button type="button" class="btn btn-outline" id="dashExportBtn">Exporter CSV</button>
+          <a class="btn btn-outline" href="index.html" target="_blank" style="display:inline-flex;align-items:center">Voir le site</a>
+        </div>
       </div>
 
       <!-- Products panel -->
-      <div class="panel active" id="panel-products">
+      <div class="panel" id="panel-products">
         <div class="toolbar">
           <h2>Articles — marque principale <span id="productCount"></span></h2>
-          <button class="btn" id="addProductBtn">+ Article</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-outline" id="exportCsvBtn">Exporter CSV</button>
+            <button class="btn" id="addProductBtn">+ Article</button>
+          </div>
         </div>
         <div class="table-wrap" id="productTableWrap">
           <table>
             <thead>
               <tr>
+                <th>Ordre</th>
                 <th>Image</th>
                 <th>Nom</th>
                 <th>Catégorie</th>
-                <th>Sous-marque</th>
+                <th>À la une</th>
                 <th>Prix</th>
                 <th></th>
               </tr>
@@ -499,6 +567,38 @@
       </div>
     </div>
   </div>
+
+
+      <!-- Settings -->
+      <div class="panel" id="panel-settings">
+        <div class="toolbar">
+          <h2>Réglages WhatsApp</h2>
+        </div>
+        <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;max-width:560px;line-height:1.5">
+          Libellés et numéros affichés au moment de la commande sur le site. Format numéro : 237XXXXXXXXX (sans + ni espaces).
+        </p>
+        <form id="waSettingsForm" style="max-width:480px;background:#fff;border:1px solid var(--line);padding:24px">
+          <div class="field">
+            <label>Numéro 1 — libellé</label>
+            <input id="wa1Label" placeholder="Commandes" value="Commandes">
+          </div>
+          <div class="field">
+            <label>Numéro 1 — téléphone</label>
+            <input id="wa1Number" placeholder="237690100325" value="237690100325">
+          </div>
+          <div class="field" style="margin-top:16px">
+            <label>Numéro 2 — libellé</label>
+            <input id="wa2Label" placeholder="Service client" value="Service client">
+          </div>
+          <div class="field">
+            <label>Numéro 2 — téléphone</label>
+            <input id="wa2Number" placeholder="237695149577" value="237695149577">
+          </div>
+          <div class="modal-actions" style="margin-top:20px">
+            <button type="submit" class="btn">Enregistrer</button>
+          </div>
+        </form>
+      </div>
 
   <!-- Product modal -->
   <div class="overlay" id="productModal">
@@ -658,7 +758,7 @@
     if (sessionStorage.getItem('ck_admin_pwd') === PASSWORD) {
       loginScreen.style.display = 'none';
       adminShell.style.display = 'block';
-      if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); }
+      if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); loadWaSettings(); loadDashboard(); }
     }
     document.getElementById('loginBtn').onclick = () => {
       if (document.getElementById('passwordInput').value === PASSWORD) {
@@ -666,7 +766,7 @@
         document.getElementById('loginError').style.display = 'none';
         loginScreen.style.display = 'none';
         adminShell.style.display = 'block';
-        if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); }
+        if (initSupabase()) { loadProducts(); loadSubbrands(); loadVitrine(); loadWaSettings(); loadDashboard(); }
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
@@ -689,40 +789,129 @@
         if (pane) {
           pane.classList.add('active');
           setTimeout(() => pane.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+          if (tab.dataset.tab === 'dash') loadDashboard();
+          if (tab.dataset.tab === 'settings') loadWaSettings();
         }
       };
     });
 
     // ——— Products ———
+    let allProductsCache = [];
+
+    async function loadDashboard() {
+      try {
+        const [{ data: prods }, { data: subs }] = await Promise.all([
+          supabaseClient.from('products').select('id,sub_brand_id,featured'),
+          supabaseClient.from('sub_brands').select('id')
+        ]);
+        const list = prods || [];
+        allProductsCache = list;
+        const main = list.filter(p => !p.sub_brand_id);
+        const subP = list.filter(p => p.sub_brand_id);
+        const feat = list.filter(p => p.featured);
+        const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+        set('dTotal', list.length);
+        set('dMain', main.length);
+        set('dSub', subP.length);
+        set('dFeat', feat.length);
+        set('dBrands', (subs || []).length);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     async function loadProducts() {
-      const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
-      if (error) { showStatus(error.message, 'err'); return; }
-      // Marque principale uniquement (pas les sous-marques)
-      const list = (data || []).filter(p => !p.sub_brand_id);
+      let res = await supabaseClient.from('products').select('*').order('sort_order', { ascending: true }).order('id', { ascending: false });
+      if (res.error && /sort_order/i.test(res.error.message || '')) {
+        res = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+      }
+      if (res.error) { showStatus(res.error.message, 'err'); return; }
+      const all = res.data || [];
+      allProductsCache = all;
+      // Marque principale uniquement
+      const list = all.filter(p => !p.sub_brand_id);
       document.getElementById('productCount').textContent = '(' + list.length + ')';
       const wrap = document.getElementById('productTableWrap');
       const empty = document.getElementById('productEmpty');
       if (!list.length) {
         wrap.style.display = 'none';
         empty.style.display = 'block';
+        loadDashboard();
         return;
       }
       wrap.style.display = 'block';
       empty.style.display = 'none';
-      document.getElementById('productsBody').innerHTML = list.map(p => {
+      document.getElementById('productsBody').innerHTML = list.map((p, i) => {
         const img = p.image ? `<img class="thumb" src="${escapeHtml(p.image)}">` : `<div class="thumb-ph">—</div>`;
+        const feat = p.featured ? '<span class="badge" style="background:#C41E24;color:#fff">Oui</span>' : '—';
         return `<tr>
+          <td>
+            <div class="sort-btns">
+              <button type="button" title="Monter" onclick="moveProduct(${p.id}, -1)">▲</button>
+              <button type="button" title="Descendre" onclick="moveProduct(${p.id}, 1)">▼</button>
+            </div>
+          </td>
           <td>${img}</td>
           <td><strong>${escapeHtml(p.name)}</strong></td>
           <td><span class="badge">${escapeHtml(p.category || '')}</span></td>
-          <td>Principale</td>
+          <td>${feat}</td>
           <td>${formatPrice(p.price)}</td>
           <td class="actions">
-            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Modifier</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Suppr.</button>
           </td>
         </tr>`;
       }).join('');
+      loadDashboard();
+    }
+
+    window.moveProduct = async function(id, dir) {
+      const main = (allProductsCache || []).filter(p => !p.sub_brand_id)
+        .slice()
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0) || b.id - a.id);
+      const idx = main.findIndex(p => p.id === id);
+      if (idx < 0) return;
+      const j = idx + dir;
+      if (j < 0 || j >= main.length) return;
+      const a = main[idx];
+      const b = main[j];
+      const orderA = a.sort_order != null ? a.sort_order : a.id;
+      const orderB = b.sort_order != null ? b.sort_order : b.id;
+      const { error: e1 } = await supabaseClient.from('products').update({ sort_order: orderB }).eq('id', a.id);
+      const { error: e2 } = await supabaseClient.from('products').update({ sort_order: orderA }).eq('id', b.id);
+      if (e1 || e2) {
+        showStatus((e1 || e2).message + ' — exécute admin-ops.sql (colonne sort_order)', 'err');
+        return;
+      }
+      showStatus('Ordre mis à jour', 'ok');
+      loadProducts();
+    };
+
+    function exportProductsCsv() {
+      const rows = (allProductsCache || []).length
+        ? allProductsCache
+        : [];
+      (async () => {
+        let list = rows;
+        if (!list.length) {
+          const { data } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+          list = data || [];
+        }
+        const header = ['id', 'name', 'category', 'price', 'featured', 'sub_brand_id', 'sort_order', 'description'];
+        const esc = (v) => {
+          const s = v == null ? '' : String(v);
+          return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const lines = [header.join(',')].concat(list.map(p => header.map(h => esc(p[h])).join(',')));
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'coolestkidz-articles.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        showStatus('Export CSV téléchargé', 'ok');
+      })();
     }
 
     let currentSubDetailId = null;
@@ -1122,6 +1311,51 @@
         btn.disabled = false;
       }
     };
+
+
+    async function loadWaSettings() {
+      try {
+        const el = document.getElementById('wa1Label');
+        if (!el) return;
+        const { data } = await supabaseClient.from('site_settings').select('key,value');
+        const map = {};
+        (data || []).forEach(r => { map[r.key] = r.value; });
+        if (map.wa1_label) document.getElementById('wa1Label').value = map.wa1_label;
+        if (map.wa1_number) document.getElementById('wa1Number').value = map.wa1_number;
+        if (map.wa2_label) document.getElementById('wa2Label').value = map.wa2_label;
+        if (map.wa2_number) document.getElementById('wa2Number').value = map.wa2_number;
+      } catch (e) { console.warn(e); }
+    }
+
+    (function wireWaForm() {
+      const form = document.getElementById('waSettingsForm');
+      if (!form) return;
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const pairs = [
+          ['wa1_label', document.getElementById('wa1Label').value.trim() || 'Commandes'],
+          ['wa1_number', (document.getElementById('wa1Number').value || '').replace(/\D/g, '') || '237690100325'],
+          ['wa2_label', document.getElementById('wa2Label').value.trim() || 'Service client'],
+          ['wa2_number', (document.getElementById('wa2Number').value || '').replace(/\D/g, '') || '237695149577']
+        ];
+        try {
+          for (const [key, value] of pairs) {
+            const { error } = await supabaseClient.from('site_settings').upsert({ key, value }, { onConflict: 'key' });
+            if (error) throw error;
+          }
+          showStatus('Numéros WhatsApp enregistrés', 'ok');
+        } catch (err) {
+          showStatus(err.message || 'Erreur (table site_settings ?)', 'err');
+        }
+      };
+    })();
+
+    (function wireExport() {
+      const a = document.getElementById('exportCsvBtn');
+      const b = document.getElementById('dashExportBtn');
+      if (a) a.onclick = exportProductsCsv;
+      if (b) b.onclick = exportProductsCsv;
+    })();
 
     // ——— Vitrine images (Homme / Femme cards) ———
     let vHommeFile = null;

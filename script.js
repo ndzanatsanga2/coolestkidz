@@ -85,6 +85,31 @@
     });
   }
 
+
+  var waConfig = {
+    wa1: { number: "237690100325", label: "Commandes" },
+    wa2: { number: "237695149577", label: "Service client" }
+  };
+
+  async function loadWaConfig(client) {
+    if (!client) return;
+    try {
+      var res = await client.from("site_settings").select("key,value").in("key", [
+        "wa1_number", "wa1_label", "wa2_number", "wa2_label"
+      ]);
+      if (res.error || !res.data) return;
+      res.data.forEach(function (row) {
+        if (!row.value) return;
+        if (row.key === "wa1_number") waConfig.wa1.number = String(row.value).replace(/\D/g, "");
+        if (row.key === "wa1_label") waConfig.wa1.label = row.value;
+        if (row.key === "wa2_number") waConfig.wa2.number = String(row.value).replace(/\D/g, "");
+        if (row.key === "wa2_label") waConfig.wa2.label = row.value;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   var subBrandMap = {};
 
   async function loadSubBrandMap(client) {
@@ -156,7 +181,11 @@
           .from("products")
           .select("*")
           .eq("featured", true)
+          .order("sort_order", { ascending: true })
           .order("id", { ascending: false });
+        if (res.error && /sort_order/i.test(res.error.message || "")) {
+          res = await client.from("products").select("*").eq("featured", true).order("id", { ascending: false });
+        }
         if (res.error) throw res.error;
         var list = res.data || [];
         featured.innerHTML = list.length
@@ -180,7 +209,10 @@
       }
       try {
         await loadSubBrandMap(client);
-        var res = await client.from("products").select("*").order("id", { ascending: false });
+        var res = await client.from("products").select("*").order("sort_order", { ascending: true }).order("id", { ascending: false });
+        if (res.error && /sort_order/i.test(res.error.message || "")) {
+          res = await client.from("products").select("*").order("id", { ascending: false });
+        }
         if (res.error) throw res.error;
         // Vue globale Homme/Femme : principale + sous-marques ciblées
         var list = (res.data || []).filter(function (p) {
@@ -212,6 +244,7 @@
         return;
       }
       try {
+        await loadWaConfig(client);
         var res = await client.from("products").select("*").eq("id", id).single();
         if (res.error || !res.data) throw res.error || new Error("not found");
         var data = res.data;
@@ -277,10 +310,12 @@
           escapeHtml(data.description || "Pièce CoolestKidz — qualité premium.") +
           "</p>" +
           '<div class="pdp-actions">' +
-          '<p class="pdp-wa-label">Commander via WhatsApp — choisissez un numéro</p>' +
+          '<p class="pdp-wa-label">Commander via WhatsApp — choisissez un contact</p>' +
           '<div class="pdp-wa-row" id="pdpWaRow">' +
-          '<a class="btn btn-red pdp-wa-btn" id="pdpWa1" href="#" target="_blank" rel="noopener">+237 690 100 325</a>' +
-          '<a class="btn btn-red pdp-wa-btn" id="pdpWa2" href="#" target="_blank" rel="noopener">+237 695 149 577</a>' +
+          '<a class="btn btn-red pdp-wa-btn" id="pdpWa1" href="#" target="_blank" rel="noopener">' +
+          escapeHtml(waConfig.wa1.label) + '</a>' +
+          '<a class="btn btn-red pdp-wa-btn" id="pdpWa2" href="#" target="_blank" rel="noopener">' +
+          escapeHtml(waConfig.wa2.label) + '</a>' +
           "</div>" +
           '<a class="btn btn-outline-dark" href="' +
           (cat === "Femme" ? "femme.html" : "homme.html") +
@@ -303,8 +338,14 @@
           var q = encodeURIComponent(msg);
           var wa1 = document.getElementById("pdpWa1");
           var wa2 = document.getElementById("pdpWa2");
-          if (wa1) wa1.href = "https://wa.me/237690100325?text=" + q;
-          if (wa2) wa2.href = "https://wa.me/237695149577?text=" + q;
+          if (wa1) {
+            wa1.href = "https://wa.me/" + waConfig.wa1.number + "?text=" + q;
+            wa1.textContent = waConfig.wa1.label;
+          }
+          if (wa2) {
+            wa2.href = "https://wa.me/" + waConfig.wa2.number + "?text=" + q;
+            wa2.textContent = waConfig.wa2.label;
+          }
         }
         updatePdpVariant(firstPrice, firstLabel);
 
